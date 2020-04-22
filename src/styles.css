@@ -1,0 +1,21 @@
+/* You can add global styles to this file, and also import other style files */
+
+.pointer {
+    cursor: pointer;
+}
+
+.contenedor-ico {
+    width: 20px;
+  }
+
+  .star-empty, .star-half, .star-filled {
+      width: 38px;
+      fill: yellow;
+    }
+
+    
+
+    .numero-calificacion {
+      font-size: 24px;
+      font-weight: 600;
+  }

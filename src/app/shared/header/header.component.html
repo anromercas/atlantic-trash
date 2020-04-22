@@ -1,0 +1,150 @@
+<header class="topbar">
+  <nav class="navbar top-navbar navbar-expand-md navbar-light">
+    <!-- ============================================================== -->
+    <!-- Logo -->
+    <!-- ============================================================== -->
+    <div class="navbar-header">
+      <a class="navbar-brand pointer" href="/">
+        <!-- Logo icon --><b>
+          <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
+          <!-- Dark Logo icon -->
+          <img
+            src="assets/images/logo-icon1.png"
+            alt="homepage"
+            class="dark-logo"
+          />
+        </b>
+        <!--End Logo icon -->
+        <!-- Logo text --><span>
+          <!-- dark Logo text -->
+          <img
+            src="assets/images/logo-text1.png"
+            alt="homepage"
+            class="dark-logo"
+          />
+        </span>
+      </a>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Logo -->
+    <!-- ============================================================== -->
+    <div class="navbar-collapse">
+      <!-- ============================================================== -->
+      <!-- toggle and nav items -->
+      <!-- ============================================================== -->
+      <ul class="navbar-nav mr-auto">
+        <!-- <li class="nav-item"> <a class="nav-link nav-toggler hidden-md-up waves-effect waves-dark" href="javascript:void(0)"><i class="ti-menu"></i></a> </li>
+                <li class="nav-item"> <a class="nav-link sidebartoggler hidden-sm-down waves-effect waves-dark" href="javascript:void(0)"><i class="ti-menu"></i></a> </li>
+                <li class="nav-item hidden-sm-down"></li> -->
+      </ul>
+      <!-- ============================================================== -->
+      <!-- User profile and search -->
+      <!-- ============================================================== -->
+      <ul class="navbar-nav my-lg-0 d-none d-lg-flex">
+        <li class="nav-item">
+          <a
+            class="nav-link pointer"
+            routerLinkActive="active"
+            routerLink="/dashboard"
+          >
+            <i class="mdi mdi-home"></i> Inicio</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link pointer"
+            routerLinkActive="active"
+            routerLink="/listado-contenedores"
+          >
+            <i class="mdi mdi-view-list"></i> Listado Contenedores</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link pointer"
+            routerLinkActive="active"
+            routerLink="/listado-zonas"
+          >
+            <i class="mdi mdi-view-list"></i> Listado de Zonas</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link pointer"
+            routerLinkActive="active"
+            routerLink="/formulario-contenedor"
+          >
+            <i class="mdi mdi-adjust"></i> Añadir/ Editar Contenedor</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link pointer"
+            routerLinkActive="active"
+            routerLink="/informe"
+          >
+            <i class="mdi mdi-file"></i> Informe</a
+          >
+        </li>
+
+        <!-- <li class="nav-item" routerLinkActive="active">
+                        <a class="nav-link pointer" routerLink="/graficas"> <i class="mdi mdi-chart-bar"></i> Gráficas</a>
+                    </li> -->
+      </ul>
+
+      <ul class="navbar-nav d-flex d-lg-none">
+        <li>
+          <a class="nav-link pointer" (click)="openNav()"
+            ><i class="mdi mdi-view-list"></i
+          ></a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav my-lg-0">
+        <li>
+          <a class=""><i class="fas fa-line"></i></a>
+        </li>
+        <!-- ============================================================== -->
+        <!-- Profile -->
+        <!-- ============================================================== -->
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle waves-effect waves-dark"
+            href=""
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+            ><img
+              src="assets/images/user-image.png"
+              alt="user"
+              class="profile-pic"
+          /></a>
+          <div class="dropdown-menu dropdown-menu-right animated flipInY">
+            <ul class="dropdown-user">
+              <li>
+                <div class="dw-user-box">
+                  <div class="u-img">
+                    <img src="assets/images/user-image.png" alt="user" />
+                  </div>
+                  <div class="u-text">
+                    <h4>{{ _usuarioService.usuario.nombre }}</h4>
+                    <p class="text-muted">
+                      {{ _usuarioService.usuario.email }}
+                    </p>
+                    <!-- <a href="pages-profile.html" class="btn btn-rounded btn-danger btn-sm">View Profile</a> -->
+                  </div>
+                </div>
+              </li>
+              <li role="separator" class="divider"></li>
+              <li>
+                <a (click)="_loginService.logoutUser()" class="pointer"
+                  ><i class="fa fa-power-off"></i> Cerrar Sesión</a
+                >
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>

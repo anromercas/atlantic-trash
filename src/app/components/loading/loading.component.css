@@ -1,0 +1,25 @@
+.loading-container {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.2);
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(4px);
+}
+
+.message {
+  padding: 32px;
+  background-color: white;
+  border-radius: 8px;
+}
+
+.spinner-container {
+  position: relative;
+  min-height: 32px;
+  margin-bottom: 16px;
+}

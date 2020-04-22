@@ -1,0 +1,122 @@
+<div class="card">
+  <div class="card-body">
+    <h1 class="card-title">Ranking segregación por residuos</h1>
+
+    <div *ngIf="!loaded">
+      Cargando...
+    </div>
+
+    <div *ngIf="loaded">
+      <div class="row">
+        <div class="col-6">
+          <h2>Resumen Mensual</h2>
+          <div class="d-flex align-items-center no-block">
+            <canvas
+              baseChart
+              [datasets]="resumenMes.datasets"
+              [labels]="resumenMes.labels"
+              [options]="chartOptionsResumenes"
+              charType="horizontalBar"
+              [legend]="false"
+              chartType="horizontalBar"
+            ></canvas>
+          </div>
+        </div>
+        <div class="col-6">
+          <h2>Resumen Anual</h2>
+          <div class="d-flex align-items-center no-block">
+            <canvas
+              baseChart
+              [datasets]="resumenAnio.datasets"
+              [labels]="resumenAnio.labels"
+              [options]="chartOptionsResumenes"
+              charType="horizontalBar"
+              [legend]="false"
+              chartType="horizontalBar"
+            ></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div *ngFor="let residuo of rankingResiduos; let idx = index">
+        <div *ngIf="tieneProblemasContendor(residuo.nombre)">
+          <div class="row">
+            <div class="col-12">
+              <h2>
+                <img [src]="'/assets/images/contenedores/' + residuo.imgContenedor" class="contenedor-ico" />
+                <span class="titulo-nombre-residuo">{{ residuo.nombre }}</span>
+              </h2>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="row">
+              <div class="col-4 text-truncate">
+                <span class="font-bold">Media semana</span>
+                <div class="d-flex align-items-center no-block">
+                  <star-rating
+                    staticColor="positive"
+                    size="medium"
+                    [readOnly]="true"
+                    labelPosition="right"
+                    [rating]="residuo.nivelEstrellaSemana"
+                  >
+                  </star-rating>
+                  <span class="numero-calificacion">{{ residuo.nivelEstrellaSemana || '0' }}</span>
+                </div>
+              </div>
+              <div class="col-4 text-truncate">
+                <span class="font-bold">Media mes</span>
+                <div class="d-flex align-items-center no-block">
+                  <canvas
+                    baseChart
+                    [datasets]="residuo.nivelEstrellaMes.datasets"
+                    [labels]="residuo.nivelEstrellaMes.labels"
+                    [options]="residuo.nivelEstrellaMes.chartOptions"
+                    charType="horizontalBar"
+                    [legend]="false"
+                    chartType="horizontalBar"
+                    [colors]="chartColorsNiveles"
+                  ></canvas>
+                </div>
+              </div>
+              <div class="col-4 text-truncate">
+                <span class="font-bold">Media año</span>
+                <div class="d-flex align-items-center no-block">
+                  <canvas
+                    baseChart
+                    [datasets]="residuo.nivelEstrellaAnio.datasets"
+                    [labels]="residuo.nivelEstrellaAnio.labels"
+                    [options]="residuo.nivelEstrellaAnio.chartOptions"
+                    charType="horizontalBar"
+                    [legend]="false"
+                    chartType="horizontalBar"
+                    [colors]="chartColorsNiveles"
+                  ></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12">
+                <span class="font-bold">Problemas comunes últimos 12 meses</span>
+                <div style="display: block; width:100%">
+                  <canvas
+                    baseChart
+                    [datasets]="problemasContendorChartData(residuo.nombre).datasets"
+                    [labels]="problemasContendorChartData(residuo.nombre).labels"
+                    charType="horizontalBar"
+                    [colors]="chartColors"
+                    [options]="problemasContendorChartOptions(residuo.nombre)"
+                    [legend]="false"
+                    chartType="horizontalBar"
+                  ></canvas>
+                </div>
+              </div>
+            </div>
+            <hr />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

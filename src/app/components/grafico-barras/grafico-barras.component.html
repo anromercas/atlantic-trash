@@ -1,0 +1,7 @@
+<!-- <div style="display: block">
+    <canvas baseChart [datasets]="barChartData" [labels]="barChartLabels" [options]="barChartOptions" [legend]="barChartLegend" [chartType]="barChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+</div> -->
+<div style="display: block">
+    <canvas baseChart [datasets]="chartData.datasets" [colors]="chartColors" [labels]="chartData.labels"
+        [options]="barChartOptions" [legend]="false" chartType="horizontalBar" style="max-width: 400px;"></canvas>
+</div>

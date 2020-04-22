@@ -1,0 +1,91 @@
+<div class="card">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-12">
+        <h1>Problemas del contenedor por residuos</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12 col-md-6">
+        <h2>Resumen Mensual</h2>
+        <canvas baseChart [datasets]="resumenMes.datasets" [labels]="resumenMes.labels" [options]="resumenMesOptions"
+          charType="horizontalBar" [legend]="false" chartType="horizontalBar"></canvas>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <h2>Resumen Anual</h2>
+        <canvas baseChart [datasets]="resumenAnio.datasets" [labels]="resumenAnio.labels" [options]="resumenAnioOptions"
+          charType="horizontalBar" [legend]="false" chartType="horizontalBar"></canvas>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 zona-container" *ngFor="let zona of problemasResiduos">
+        <div class="row align-items-center">
+          <div class="col-xs-2">
+            <img [src]="'/assets/images/contenedores/' + zona.imagen" class="contenedor-ico" />
+          </div>
+          <div class="col-xs-10">
+            <span class="label-zona-nombre">{{ zona.nombre }}</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <table class="table table-striped">
+              <thead>
+                <th>Problema</th>
+                <th>Semana</th>
+                <th>Mes</th>
+                <th>Año</th>
+                <th>Puntuacion mensual</th>
+              </thead>
+              <tbody>
+                <tr style="background: white;">
+                  <td>{{ ProblemaBueno.name }}</td>
+                  <td>{{ ProblemaBueno.week }}</td>
+                  <td>{{ ProblemaBueno.month }}</td>
+                  <td>{{ ProblemaBueno.year }}</td>
+                  <td>
+                    <div class="d-flex align-items-center no-block">
+                      <div style="display:inherit">
+                        <div *ngFor="let number of ProblemaBueno.iconosRellenos" width="16px" [ngClass]="{
+                              'coin-icon': number == 1,
+                              'coin-original-icon': number == 0
+                            }"></div>
+                      </div>
+                      <span class="numero-calificacion">
+                        {{ ProblemaBueno.puntuacion }}
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="100%">
+                    <p>
+                  </td>
+                </tr>
+                <tr *ngFor="let problema of zona.problemas">
+                  <td>{{ problema.name }}</td>
+                  <td>{{ problema.week }}</td>
+                  <td>{{ problema.month }}</td>
+                  <td>{{ problema.year }}</td>
+                  <td>
+                    <div class="d-flex align-items-center no-block">
+                      <div style="display:inherit">
+                        <div *ngFor="let number of problema.iconosRellenos" width="16px" [ngClass]="{
+                            'coin-icon': number == 1,
+                            'coin-original-icon': number == 0
+                          }"></div>
+                      </div>
+                      <span class="numero-calificacion">
+                        {{ problema.puntuacion }}
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

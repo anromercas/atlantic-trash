@@ -1,0 +1,26 @@
+<div class="col-12 col-lg-6">
+  <div class="card">
+    <div class="card-body">
+      <h1 class="card-title">Residuos por zona</h1>
+      <div class="card-content">
+
+        <table class="table table-hover full-color-table full-info-table hover-table table-responsive">
+          <thead>
+            <tr>
+              <th>Zona</th>
+              <th>Residuo</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let zona of zonas; let idx = index">
+              <td>{{zona.zona}}</td>
+              <td>{{zona.residuos.join(' ')}}</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+</div>

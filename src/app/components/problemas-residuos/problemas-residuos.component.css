@@ -1,0 +1,36 @@
+.label-zona-nombre {
+  margin-left: 8px;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.coin-original-icon {
+  width: 20px;
+  height: 20px;
+  background-color: #67757c;
+  background: url(/assets/images/trash.icons.svg) no-repeat center;
+  margin: 0 2px;
+}
+
+.coin-icon {
+  width: 20px;
+  height: 20px;
+  background-color: green;
+  -webkit-mask: url(/assets/images/trash.icons.svg) no-repeat center;
+  mask: url(/assets/images/trash.icons.svg) no-repeat center;
+  margin: 0 2px;
+}
+
+.zona-container {
+  border: 1px solid blue;
+  margin: 8px;
+  padding: 24px;
+}
+
+.numero-calificacion {
+  margin: 0 8px;
+}
+
+th {
+  font-size: 1.3em;
+}

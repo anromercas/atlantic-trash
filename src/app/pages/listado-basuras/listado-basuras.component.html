@@ -1,0 +1,91 @@
+<div class="row">
+  <div class="col-12 animated fadeInUpBig">
+    <div class="card">
+      <div class="card-body">
+        <h3 class="card-title">
+          <b>
+            Contenedores realizados semana del
+            {{ from | date: 'dd/MM/yyyy' }} al {{ to | date: 'dd/MM/yyyy' }}
+          </b>
+        </h3>
+        <div class="row">
+          <div class="col-4">
+            <div class="card">
+              <div class="box bg-info text-center">
+                <h1 class="font-light text-white">{{ total }}</h1>
+                <h6 class="text-white">Contenedores</h6>
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="card">
+              <div class="box bg-primary text-center">
+                <h1 class="font-light text-white">{{ zonasCount || '0' }}</h1>
+                <h6 class="text-white">Zonas</h6>
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="card">
+              <div class="box bg-success text-center">
+                <h1 class="font-light text-white">
+                  {{ calificadasHoy }}
+                </h1>
+                <h6 class="text-white">Calificadas Hoy ({{ today | date: 'dd/MM/yyyy' }})</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="total == 0">
+          <h2 class="text-center">Sin contenedores</h2>
+        </div>
+
+        <div *ngIf="total > 0">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Codigo</th>
+                <th>Nombre</th>
+                <th>Zona</th>
+                <th>Puntuación</th>
+                <th></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let contenedor of contenedores">
+                <td>
+                  <img [src]="'/assets/images/contenedores/' + contenedor.imgContenedor" class="contenedor-ico" />
+                </td>
+                <td>
+                  <h4>{{ contenedor.codigoContenedor }}</h4>
+                </td>
+                <td>
+                  <h4>{{ contenedor.nombre }}</h4>
+                </td>
+                <td>
+                  <h4>{{ contenedor.zona }}</h4>
+                </td>
+                <td class="text-center">
+                  <span class=" badge badge-pill badge-dark">{{ contenedor.calificacion || '-' }}</span>
+                </td>
+                <td>
+                  <a
+                    class="btn btn-primary"
+                    [routerLink]="['/ficha-contenedor', contenedor.idBasura || contenedor._id]"
+                    href="#"
+                    role="button"
+                  >
+                    <i class="fa fa-eye"></i> Ver calificación
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

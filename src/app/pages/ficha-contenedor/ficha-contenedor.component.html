@@ -1,0 +1,74 @@
+<h1 class="d-inline">Ficha del Contenedor</h1>
+<div class="card" *ngIf="basura != null">
+  <div class="card-body">
+    <div class="row">
+      <div clas="col-6">
+        <img class="card-img-top img-contenedor" [src]="imageToShow" alt="" />
+      </div>
+      <div class="col-6">
+        <h1>{{ basura.nombre }}</h1>
+        <h4 class="card-title">{{ basura.zona }}</h4>
+        <p class="card-text"></p>
+        <button
+          role="button"
+          class="btn btn-primary"
+          (click)="showHistorico()"
+          *ngIf="!historicoShowed; else hideHistoricoButton"
+        >
+          Ver histórico
+        </button>
+        <ng-template #hideHistoricoButton>
+          <button role="button" class="btn btn-primary" (click)="hideHistorico()">
+            Ocultar histórico
+          </button>
+        </ng-template>
+      </div>
+    </div>
+    <p></p>
+    <div class="row" *ngIf="historico != null">
+      <div class="col-12" *ngIf="historico.length == 0">
+        <div>
+          <h3 class="text-center">Sin historico</h3>
+        </div>
+      </div>
+      <div class="col-12" *ngIf="historico.length > 0">
+        <div>
+          <table class="table table-hover color-bordered-table inverse-bordered-table">
+            <thead>
+              <tr>
+                <th>imagen</th>
+                <th>Fecha</th>
+                <th>Calificación</th>
+                <th>Estado</th>
+                <th>Residuo</th>
+                <th>Observaciones</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let h of historico" (click)="openModal(h)">
+                <td>
+                  <a [href]="h.imgBlob" target="_blank" *ngIf="h.hasImage; else notFoundImage">
+                    <img class="img-contenedor" [src]="h.imgBlob" />
+                  </a>
+                  <ng-template #notFoundImage>
+                    <img class="img-contenedor" [src]="h.imgBlob" />
+                  </ng-template>
+                </td>
+                <td>{{ (h.fecha | date: 'dd/MM/yyyy') || '-' }}</td>
+                <td>
+                  <h3>
+                    <b>{{ h.calificacion }}</b>
+                  </h3>
+                </td>
+                <td>{{ h.estado || '-' }}</td>
+                <td>{{ h.residuo || '-' }}</td>
+                <td>{{ h.observaciones || '' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

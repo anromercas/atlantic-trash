@@ -1,0 +1,116 @@
+<div class="card">
+  <div class="card-body">
+    <h1 class="card-title">Ranking segregación por Zonas</h1>
+
+    <div class="row">
+      <div class="col-xs-12 col-md-6">
+        <h2>Resumen Mensual</h2>
+        <canvas
+          baseChart
+          [datasets]="chartPuntuacionMensual.datasets"
+          [labels]="chartPuntuacionMensual.labels"
+          [options]="this.chartOptionsPuntuacionMensual"
+          chartType="horizontalBar"
+          [legend]="false"
+        ></canvas>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <h2>Resumen Anual</h2>
+        <canvas
+          baseChart
+          [datasets]="chartPuntuacionAnual.datasets"
+          [labels]="chartPuntuacionAnual.labels"
+          [options]="this.chartOptionsPuntuacionAnual"
+          chartType="horizontalBar"
+          [legend]="false"
+        ></canvas>
+      </div>
+    </div>
+    <p></p>
+    <hr />
+    <p></p>
+    <div *ngFor="let zona of zonas; let idx = index">
+      <div class="row">
+        <div class="col-12">
+          <h2>
+            <span [ngClass]="['badge', zona.numeroZonaSafe]">{{
+              zona.numeroZona
+            }}</span>
+            - {{ zona.nombre }}
+          </h2>
+        </div>
+        <div class="col-12">
+          <div class="row">
+            <div class="col-4 text-truncate">
+              <span class="font-bold">Calificación semana</span>
+              <div class="d-flex align-items-center no-block">
+                <star-rating
+                  staticColor="positive"
+                  size="medium"
+                  [readOnly]="true"
+                  labelPosition="right"
+                  [rating]="zona.numEstrellaSemana"
+                >
+                </star-rating>
+                <span class="numero-calificacion">{{
+                  zona.numEstrellaSemana
+                }}</span>
+              </div>
+            </div>
+            <div class="col-4 text-truncate">
+              <span class="font-bold">Calificación mes</span>
+              <div class="d-flex align-items-center no-block">
+                <canvas
+                  baseChart
+                  [datasets]="zona.nivelEstrellaMes.datasets"
+                  [labels]="zona.nivelEstrellaMes.labels"
+                  [options]="zona.nivelEstrellaMes.chartOptions"
+                  chartType="horizontalBar"
+                  [legend]="false"
+                  [colors]="chartColorsNiveles"
+                ></canvas>
+                <!-- <star-rating staticColor="positive" size="medium" [readOnly]="true" labelPosition="right"
+                  [rating]="zona.numEstrellaMes">
+                </star-rating>
+                <span class="numero-calificacion">{{
+                  zona.numEstrellaMes
+                }}</span> -->
+              </div>
+            </div>
+            <div class="col-4 text-truncate">
+              <span class="font-bold">Calificación año</span>
+              <div class="d-flex align-items-center no-block">
+                <canvas
+                  baseChart
+                  [datasets]="zona.nivelEstrellaAnio.datasets"
+                  [labels]="zona.nivelEstrellaAnio.labels"
+                  [options]="zona.nivelEstrellaAnio.chartOptions"
+                  charType="horizontalBar"
+                  [legend]="false"
+                  chartType="horizontalBar"
+                  [colors]="chartColorsNiveles"
+                ></canvas>
+                <!-- <star-rating
+                  staticColor="positive"
+                  size="medium"
+                  [readOnly]="true"
+                  labelPosition="right"
+                  [rating]="zona.numEstrellaAnio"
+                >
+                </star-rating>
+                <span class="numero-calificacion">{{
+                  zona.numEstrellaAnio
+                }}</span> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <hr />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

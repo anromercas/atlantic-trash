@@ -1,0 +1,24 @@
+<div class="card">
+  <div class="card-body">
+    <h1 class="card-title">Problemas comunes últimos doce meses</h1>
+    <div class="card-content">
+
+      <table class="table table-hover full-color-table full-info-table">
+        <thead>
+          <tr>
+            <th>Zona</th>
+            <th>Problema</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let problema of problemasComunes; let idx = index">
+            <td>{{problema.nombre}}</td>
+            <td>{{problema.cuantos}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>

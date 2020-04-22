@@ -1,0 +1,52 @@
+<div>
+  <h1 class="box-title m-b-20">Cambiar contraseña</h1>
+  <form [formGroup]="changePassForm" class="form-horizontal form-material animated fadeIn" (ngSubmit)="changePass()">
+    <div class="form-group">
+      <div class="col-xs-12">
+        <input class="form-control" formControlName="oldPass" type="password" placeholder="Contraseña Actual" />
+        <span *ngIf="
+            changePassForm.controls['oldPass'].invalid &&
+            (changePassForm.controls['oldPass'].dirty ||
+              changePassForm.controls['oldPass'].touched)
+          " class="label label-danger">
+          Campo obligatorio
+        </span>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-xs-12">
+        <input class="form-control" formControlName="newPass" type="password" placeholder="Nueva contraseña" />
+        <span *ngIf="
+            changePassForm.controls['newPass'].invalid &&
+            (changePassForm.controls['newPass'].dirty ||
+              changePassForm.controls['newPass'].touched)
+          " class="label label-danger">
+          Campo obligatorio
+        </span>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-xs-12">
+        <input class="form-control" formControlName="newPassRepeat" type="password"
+          placeholder="Repita nueva contraseña" />
+        <span *ngIf="
+            changePassForm.controls['newPassRepeat'].invalid &&
+            (changePassForm.controls['newPassRepeat'].dirty ||
+              changePassForm.controls['newPassRepeat'].touched)
+          " class="label label-danger">
+          Campo obligatorio
+        </span>
+      </div>
+      <span *ngIf="changePassForm.hasError('notSame')" class="label label-danger">
+        Las contraseñas no coinciden
+      </span>
+    </div>
+    <div class="form-group text-center">
+      <div class="col-xs-12 p-b-20">
+        <button class="btn btn-block btn-lg btn-info btn-rounded" type="submit">
+          Cambiar contraseña
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

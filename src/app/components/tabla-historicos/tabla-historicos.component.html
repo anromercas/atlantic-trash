@@ -1,0 +1,28 @@
+<table class="table table-striped" id="tablaHistoricos">
+  <thead>
+    <tr>
+      <th scope="col" sortable="fecha" (sort)="onSort($event)">Fecha</th>
+      <th scope="col" sortable="zonaSelect" (sort)="onSort($event)">Zona</th>
+      <th scope="col" sortable="numeroContenedor" (sort)="onSort($event)">Numero</th>
+      <th scope="col" sortable="codigoContenedor" (sort)="onSort($event)">Código</th>
+      <th scope="col" sortable="nombre" (sort)="onSort($event)">Nombre</th>
+      <th scope="col" sortable="calificacion" (sort)="onSort($event)">Calificacion segregación</th>
+      <th scope="col">Estado</th>
+      <th scope="col">Residuo mal segregado</th>
+      <th scope="col">Observaciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let historico of historicosTabla">
+      <td>{{historico.fecha | date: 'dd/MM/yyy hh:mm' }}</td>
+      <td>{{ historico.zona }}</td>
+      <td>{{ historico.numeroContenedor }}</td>
+      <td>{{ historico.codigoContenedor }}</td>
+      <td>{{ historico.nombre }}</td>
+      <td>{{ historico.calificacion }}</td>
+      <td>{{ historico.estado }}</td>
+      <td>{{ historico.residuo }}</td>
+      <td>{{ historico.observaciones }}</td>
+    </tr>
+  </tbody>
+</table>

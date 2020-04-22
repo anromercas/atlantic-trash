@@ -1,0 +1,154 @@
+<!-- ============================================================== -->
+<!-- Main wrapper - style you can find in pages.scss -->
+<!-- ============================================================== -->
+<section id="wrapper">
+  <div
+    class="login-register"
+    style="background-image:url(../assets/images/background/login-register.png);background-size: auto;
+    min-height: 100vh;"
+  >
+    <div class="login-box card">
+      <div class="card-body">
+        <div class="form-group centrar">
+          <img src="../assets/images/logo-login.png" alt="" />
+        </div>
+        <form
+          ngNativeValidate
+          #f="ngForm"
+          *ngIf="showLogin"
+          class="form-horizontal form-material animated fadeIn"
+          id="loginform"
+          action="index.html"
+          (ngSubmit)="login(f)"
+        >
+          <h1 class="box-title m-b-20">Acceder</h1>
+          <div class="form-group ">
+            <div class="col-xs-12">
+              <input
+                class="form-control"
+                [ngModel]="email"
+                name="email"
+                type="text"
+                required
+                placeholder="Email"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-xs-12">
+              <input
+                class="form-control"
+                ngModel
+                name="pass"
+                type="password"
+                required
+                placeholder="Contraseña"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-md-12">
+              <div class="checkbox checkbox-info pull-right p-t-0">
+                <input
+                  [ngModel]="recuerdame"
+                  name="recuerdame"
+                  id="checkbox-signup"
+                  type="checkbox"
+                  class="filled-in chk-col-light-blue"
+                />
+                <label for="checkbox-signup"> Recordar </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group text-center">
+            <div class="col-xs-12 p-b-20">
+              <button
+                class="btn btn-block btn-lg btn-info btn-rounded"
+                type="submit"
+              >
+                Acceder
+              </button>
+            </div>
+          </div>
+        </form>
+        <div *ngIf="showChangePassword" class="animated fadeIn">
+          <app-changepass
+            [idUsuario]="idUsuario"
+            (returnLogin)="returnLogin()"
+          ></app-changepass>
+        </div>
+        <div *ngIf="setupTwoFactor" class="animated fadeIn">
+          <h1 class="box-title m-b-20">Configurar</h1>
+          <p>
+            Escanee este código con la aplicacíon
+            <strong>Google Authenticator</strong>. Una vez que lo escanee pulse
+            siguiente. Tambien puede usar el código que se muestra
+          </p>
+          <br />
+          <div class="col-xs-12 text-center">
+            <span class="code-token">{{ codeToken }}</span>
+          </div>
+          <br />
+          <div class="col-xs-12 text-center">
+            <img [src]="imgQR" class="image-qr" />
+          </div>
+
+          <button
+            class="btn btn-block btn-lg btn-info btn-rounded"
+            type="button"
+            (click)="showTwoFactorLogin()"
+          >
+            Siguiente
+          </button>
+        </div>
+        <div *ngIf="loginTwoFactor" class="animated fadeIn">
+          <h1 class="box-title m-b-20">Acceder</h1>
+          <p>
+            Introduzca el código que le ofrece la aplicación
+            <strong>Google Authenticator</strong>
+          </p>
+          <br />
+          <form
+            ngNativeValidate
+            #f2="ngForm"
+            class="form-horizontal form-material"
+            id=""
+            action="index.html"
+            (ngSubmit)="onTwoFactorLogin(f2)"
+          >
+            <div class="form-group ">
+              <div class="col-xs-12">
+                <input
+                  class="form-control"
+                  [ngModel]="twoFactorCode"
+                  name="twoFactorCode"
+                  type="text"
+                  required
+                  required
+                  placeholder="Codigo Google Authenticator"
+                />
+              </div>
+            </div>
+            <div class="form-group text-center">
+              <div class="col-xs-12 p-b-20">
+                <button
+                  class="btn btn-block btn-lg btn-info btn-rounded"
+                  type="submit"
+                >
+                  Verificar
+                </button>
+              </div>
+              <div class="text-right">
+                <button class="btn" (click)="goBack()">Volver al login</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================== -->
+<!-- End Wrapper -->
+<!-- ============================================================== -->

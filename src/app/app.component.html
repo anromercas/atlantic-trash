@@ -1,0 +1,37 @@
+<div id="mySidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" (click)="closeNav()">&times;</a>
+  <a class="text-truncate" routerLink="/dashboard" (click)="closeNav()">
+    Inicio
+  </a>
+  <a
+    class="text-truncate"
+    routerLink="/listado-contenedores"
+    (click)="closeNav()"
+  >
+    Contenedores
+  </a>
+  <a class="text-truncate" routerLink="/listado-zonas" (click)="closeNav()">
+    Zonas
+  </a>
+  <a
+    class="text-truncate"
+    routerLink="/formulario-contenedor"
+    (click)="closeNav()"
+  >
+    Añadir/ editar contenedor
+  </a>
+  <a class="text-truncate" routerLink="/informe" (click)="closeNav()">
+    Informe
+  </a>
+  <hr />
+  <a class="text-truncate" routerLink="/login" (click)="closeNav()">
+    Cerrar sesión
+  </a>
+</div>
+<div id="overlay" (click)="closeNav()"></div>
+
+<!-- Add all page content inside this div if you want the side nav to push page content to the right (not used if you only want the sidenav to sit on top of the page -->
+<div id="main">
+  <router-outlet></router-outlet>
+  <app-loading></app-loading>
+</div>

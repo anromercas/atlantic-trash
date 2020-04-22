@@ -1,0 +1,40 @@
+<div class="row">
+
+    <div class="col-12 animated fadeInLeftBig">
+
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title">
+                    <b>Listado de Zonas</b>
+                </h1>
+                <div *ngIf="zonas.length == 0">
+                    <h3>Sin Zonas</h3>
+                </div>
+                <table class="table table-hover color-bordered-table inverse-bordered-table" *ngIf="zonas.length > 0">
+                    <thead>
+                        <tr>
+                            <th>Área</th>
+                            <th>Zona</th>
+                            <th>Puntuación</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr *ngFor="let zona of zonas">
+                            <td>{{zona.area || '-'}}</td>
+                            <td>{{zona.zona}}</td>
+                            <td>
+                                <h3><b>{{zona.puntuacion}}</b></h3>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+
+            </div>
+        </div>
+
+    </div>
+
+</div>

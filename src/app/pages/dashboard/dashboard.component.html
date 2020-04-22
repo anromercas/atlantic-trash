@@ -1,0 +1,42 @@
+<div *ngIf="isLoaded">
+  <div class="row animated fadeInDown">
+    <app-progreso-semana
+      class="col-12 col-lg-4"
+      [contenedores]="contenedores"
+    ></app-progreso-semana>
+    <app-mejor-zona-mes
+      class="col-12 col-lg-4"
+      [contenedores]="contenedores"
+    ></app-mejor-zona-mes>
+    <app-mejor-residuo-mes
+      class="col-12 col-lg-4"
+      [contenedores]="contenedores"
+    ></app-mejor-residuo-mes>
+  </div>
+
+  <div class="row">
+    <app-ranking-zonas
+      class="animated fadeInLeft col-12 col-lg-6"
+      [contenedores]="contenedores"
+    ></app-ranking-zonas>
+    <app-ranking-residuos
+      class="animated fadeInRight col-12 col-lg-6"
+      [contenedores]="contenedores"
+    ></app-ranking-residuos>
+  </div>
+
+  <div class="row">
+    <app-problemas-zonas
+      class="animated fadeInLeft col-12 col-lg-6"
+      [contenedores]="contenedores"
+    ></app-problemas-zonas>
+    <app-problemas-residuos
+      class="animated fadeInRight col-12 col-lg-6"
+      [contenedores]="contenedores"
+    ></app-problemas-residuos>
+    <!-- 
+    <app-problemas-comunes class="animated fadeInLeft col-12 col-lg-6" [contenedores]="contenedores">
+    </app-problemas-comunes> -->
+    <!-- <app-residuos-zona class="animated fadeInRight col-12 col-lg-6" [contenedores]="contenedores"></app-residuos-zona> -->
+  </div>
+</div>

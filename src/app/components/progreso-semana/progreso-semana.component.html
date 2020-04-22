@@ -1,0 +1,21 @@
+<div class="card bg-success text-white">
+  <div class="card-body">
+    <div class="d-flex">
+      <div class="stats">
+        <h1 class="text-white">
+          {{ contenedoresValoradosCount }} / {{ contenedoresCount }}
+        </h1>
+        <h4 class="text-white">Progreso Semana</h4>
+        <button
+          class="btn btn-rounded btn-lg btn-outline btn-light m-t-10 font-14"
+          [routerLink]="['/listado-contenedores', 'progreso-semana']"
+        >
+          Ver listado
+        </button>
+      </div>
+      <div class="stats-icon text-right ml-auto">
+        <i class="fa fa-list-ol display-5 op-3 text-dark"></i>
+      </div>
+    </div>
+  </div>
+</div>
