@@ -167,6 +167,18 @@ export class RankingResiduosComponent implements OnInit {
 
     }
 
+    this.resumenMes = {
+      labels: resumenMes.map((x) => x.nombre),
+      datasets: [{ data: resumenMes.map((x) => x.value) }],
+    };
+
+    this.resumenAnio = {
+      labels: resumenAnio.map((x) => x.nombre),
+      datasets: [{ data: resumenAnio.map((x) => x.value) }],
+    };
+
+    this.isLoading = false;
+
   }
 
   composeEstrellas() {
