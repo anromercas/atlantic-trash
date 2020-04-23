@@ -81,6 +81,7 @@ export class RankingResiduosComponent implements OnInit {
     await this.getHistorico();
     this.composeEstrellas();
     this.composeGraficaResiduos();
+    this.composeGraficas();
     this.loaded = true;
   }
 
@@ -112,6 +113,60 @@ export class RankingResiduosComponent implements OnInit {
     }
 
     this.historico = historico;
+  }
+
+
+  async getHistoricoPorFecha( nombreResiduo: string, from: moment.Moment, to: moment.Moment ) {
+    let historico: Historico[] = [];
+
+      try {
+        const response = await this.historicoService.getHistoricoResiduo(
+          from,
+          to,
+          nombreResiduo
+        );
+        const historicoResiduo = response.historicos || [];
+        historico = historico.concat(historicoResiduo);
+      } finally {
+      }
+
+    return historico;
+  }
+
+  async composeGraficas() {
+
+    const resumenMes: any[] = [];
+    const resumenAnio: any[] = [];
+
+    for (const residuo of RESIDUOS) { 
+
+      const contenedoresPuntuadosMes = await this.getHistoricoPorFecha(residuo.nombre, this.dateService.month.from, this.dateService.month.to );
+      const contenedoresPuntuadosAnio = await this.getHistoricoPorFecha(residuo.nombre, moment().subtract(12, 'months'), moment() );
+
+      const historicoResiduoMes = contenedoresPuntuadosMes.filter((x) => x.nombre.includes(residuo.nombre));
+      const historicoResiduoAnio = contenedoresPuntuadosAnio.filter((x) => x.nombre.includes(residuo.nombre));
+
+      const longitudMes = historicoResiduoMes.length;
+      const longitudAnio = historicoResiduoAnio.length;
+
+      const sumaMes = historicoResiduoMes.reduce((prev, current) => prev + current.calificacion, 0);
+      const sumaAnio = historicoResiduoAnio.reduce((prev, current) => prev + current.calificacion, 0);
+
+      const calculoMes = sumaMes / (longitudMes * 5);
+      const calculoAnio = sumaAnio / (longitudAnio * 5);
+
+      resumenMes.push({
+        nombre: (residuo && residuo.nombre) || '',
+        value: Math.round((calculoMes * 5)) || 0,
+      });
+
+      resumenAnio.push({
+        nombre: residuo.nombre,
+        value: Math.round((calculoAnio * 5)) || 0,
+      });
+
+    }
+
   }
 
   composeEstrellas() {
