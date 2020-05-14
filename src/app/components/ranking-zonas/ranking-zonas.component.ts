@@ -1,23 +1,28 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { Contenedor } from 'src/app/interface/contenedor.interface';
 import * as moment from 'moment';
 import { DatesService } from 'src/app/services/dates.service';
 import { ChartData } from 'chart.js';
+import { ZONAS } from 'src/app/data/data.zonas';
+import { HttpParams, HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-ranking-zonas',
   templateUrl: './ranking-zonas.component.html',
-  styleUrls: ['./ranking-zonas.component.css']
+  styleUrls: ['./ranking-zonas.component.css'],
 })
 export class RankingZonasComponent implements OnInit {
-  @Input() contenedores: Contenedor[];
+  // @Input() contenedores: Contenedor[];
+  @Output() onLoaded = new EventEmitter<boolean>();
 
-  zonas: RankinZonaData[] = [];
+  zonas: any[] = [];
 
-  month: any;
-  year: any;
+  week: { from: moment.Moment; to: moment.Moment };
+  month: { from: moment.Moment; to: moment.Moment };
+  year: { from: moment.Moment; to: moment.Moment };
 
-  chartPuntuacionMensual: ChartData;
+  resumenMensualChart: ChartData = {};
   chartOptionsPuntuacionMensual = {
     responsive: true,
     aspectRatio: 2,
@@ -26,14 +31,14 @@ export class RankingZonasComponent implements OnInit {
         {
           ticks: {
             beginAtZero: true,
-            max: 5
-          }
-        }
-      ]
-    }
+            max: 5,
+          },
+        },
+      ],
+    },
   };
 
-  chartPuntuacionAnual: ChartData;
+  resumenAnualChart: ChartData = {};
   chartOptionsPuntuacionAnual = {
     responsive: true,
     aspectRatio: 2,
@@ -42,17 +47,17 @@ export class RankingZonasComponent implements OnInit {
         {
           ticks: {
             beginAtZero: true,
-            max: 5
-          }
-        }
-      ]
-    }
+            max: 5,
+          },
+        },
+      ],
+    },
   };
 
   chartColorsNiveles = [
     {
-      backgroundColor: ['#7ed321']
-    }
+      backgroundColor: ['#7ed321'],
+    },
   ];
 
   chartOptionsNiveles = {
@@ -63,120 +68,138 @@ export class RankingZonasComponent implements OnInit {
         {
           ticks: {
             beginAtZero: true,
-            max: 5
-          }
-        }
-      ]
-    }
+            max: 5,
+          },
+        },
+      ],
+    },
   };
+  loaded: boolean;
 
-  constructor(private dateService: DatesService) {
-    this.month = this.dateService.getMonth();
-    this.year = this.dateService.getYear();
+  constructor(private readonly http: HttpClient) {
+    this.week = {
+      from: moment().startOf('week'),
+      to: moment().endOf('week'),
+    };
+    this.month = {
+      from: moment().subtract(4, 'week'),
+      to: moment(),
+    };
+    this.year = {
+      from: moment().subtract(12, 'month'),
+      to: moment(),
+    };
   }
 
-  ngOnInit() {
-    const zonasSet = new Set(
-      this.contenedores
-        .filter(x => x.zona !== '')
-        .filter(x => x.historico)
-        .map(x => x.zona)
-    );
-    const zonasArray = Array.from(zonasSet);
+  async ngOnInit() {
+    await this.calculateZonas();
+    // console.log(this.zonas);
+    this.loaded = true;
+    this.onLoaded.emit(true);
+  }
 
-    zonasArray.forEach(nombre => {
-      // console.log(nombre);
-      const contenedoresZona = this.contenedores.filter(x => x.zona === nombre);
+  async calculateZonas(): Promise<boolean> {
+    for (let zona of ZONAS) {
+      let nombre = zona.nombre;
 
-      const contenedoresCount = contenedoresZona.length || 0;
+      // const contenedoresZona = this.contenedores.filter((x) => x.zona.startsWith(nombre));
 
-      const puntuacion = contenedoresZona.reduce((a, b) => a + b.calificacion || 0, 1);
+      //Calculo el semanal
+      let httpParams: HttpParams = new HttpParams()
+        .set(`zona`, `${nombre}`)
+        .set('fechadesde', `${this.week.from.format('YYYY-MM-DD')}`)
+        .set('fechahasta', `${this.week.to.format('YYYY-MM-DD')}`);
+      const resultWeek = (await this.http
+        .get(`${environment.baseUrl}historicosPorZona`, { params: httpParams })
+        .toPromise()) as any;
+      const contenedoresWeekCount = resultWeek.total || 0;
+      const maxWeekPuntuacion = contenedoresWeekCount * 5;
+      const calificacionesWeek = resultWeek.historicos.reduce((a, b) => a + b.calificacion, 0);
+      const percentCalificacionWeek = (calificacionesWeek * 100) / maxWeekPuntuacion;
+      const estrellasWeek = Math.round(((percentCalificacionWeek * 5) / 100 || 0 + Number.EPSILON) * 100) / 100;
 
-      const historicoContenedoresZonasTemp = [].concat(
-        contenedoresZona
-          .filter(contenedor => contenedor.historico !== undefined)
-          .filter(contenedor => contenedor.historico.length > 0)
-          .map(contenedor => contenedor.historico)
-      );
+      // console.log(
+      //   `Zona: ${nombre}. Rango fecha: ${this.week.from.format('DD/MM/YYYY')} a ${this.week.to.format(
+      //     'DD/MM/YYYY'
+      //   )}. Contenedores: ${contenedoresWeekCount}. Max Puntuación: ${maxWeekPuntuacion}. Puntuacion: ${calificacionesWeek}. Porcentaje ${percentCalificacionWeek}. Estrellas: ${estrellasWeek}`
+      // );
 
-      const historicoContenedoresZonas = Array.prototype.concat.apply([], historicoContenedoresZonasTemp);
+      //Calculo el mensual
+      httpParams = new HttpParams()
+        .set(`zona`, `${nombre}`)
+        .set('fechadesde', `${this.month.from.format('YYYY-MM-DD')}`)
+        .set('fechahasta', `${this.month.to.format('YYYY-MM-DD')}`);
+      const resultMonth = (await this.http
+        .get(`${environment.baseUrl}historicosPorZona`, { params: httpParams })
+        .toPromise()) as any;
+      const contenedoresMonthCount = resultMonth.total || 0;
+      const maxMonthPuntuacion = contenedoresMonthCount * 5;
+      const calificacionesMonth = resultMonth.historicos.reduce((a, b) => a + b.calificacion, 0);
+      const percentCalificacionMonth = (calificacionesMonth * 100) / maxMonthPuntuacion;
+      const estrellasMonth = Math.round(((percentCalificacionMonth * 5) / 100 || 0 + Number.EPSILON) * 100) / 100;
 
-      const mediaMes = historicoContenedoresZonas
-        .filter(x => x.fecha != null && moment(x.fecha).isBetween(this.month.from, this.month.to))
-        .reduce((x, y) => x + y.calificacion || 0, 0);
+      // console.log(
+      //   `Zona: ${nombre}. Rango fecha: ${this.month.from.format('DD/MM/YYYY')} a ${this.month.to.format(
+      //     'DD/MM/YYYY'
+      //   )}. Contenedores: ${contenedoresMonthCount}. Max Puntuación: ${maxMonthPuntuacion}. Puntuacion: ${calificacionesMonth}. Porcentaje: ${percentCalificacionMonth}. Estrellas: ${estrellasMonth}`
+      // );
 
-      const mediaAnio = historicoContenedoresZonas
-        .filter(x => x.fecha != null && moment(x.fecha).isBetween(this.year.from, this.year.to))
-        .reduce((x, y) => x + y.calificacion || 0, 0);
+      //Calculo el anual
+      httpParams = new HttpParams()
+        .set(`zona`, `${nombre}`)
+        .set('fechadesde', `${this.year.from.format('YYYY-MM-DD')}`)
+        .set('fechahasta', `${this.year.to.format('YYYY-MM-DD')}`);
+      const resultYear = (await this.http
+        .get(`${environment.baseUrl}historicosPorZona`, { params: httpParams })
+        .toPromise()) as any;
+      const contenedoresYearCount = resultYear.total || 0;
+      const maxYearPuntuacion = contenedoresYearCount * 5;
+      const calificacionesYear = resultYear.historicos.reduce((a, b) => a + b.calificacion, 0);
+      const percentCalificacionYear = (calificacionesYear * 100) / maxYearPuntuacion;
+      const estrellasYear = Math.round(((percentCalificacionYear * 5) / 100 || 0 + Number.EPSILON) * 100) / 100;
 
-      const maxPuntuacionZonaSemana = contenedoresCount * 5;
-      const puntuacionZonaSemana = (puntuacion * 100) / maxPuntuacionZonaSemana;
-      const numEstrellaSemana = (puntuacionZonaSemana * 5) / 100;
+      // console.log(
+      //   `Zona: ${nombre}. Rango fecha: ${this.year.from.format('DD/MM/YYYY')} a ${this.year.to.format(
+      //     'DD/MM/YYYY'
+      //   )}. Contenedores: ${contenedoresYearCount}. Max Puntuación: ${maxYearPuntuacion}. Puntuacion: ${calificacionesYear}. Porcentaje: ${percentCalificacionYear}. Estrellas: ${estrellasYear}`
+      // );
 
-      const maxPuntuacionZonaMes = contenedoresCount * 5 * 4;
-      const puntuacionZonaMes = (mediaMes * 100) / maxPuntuacionZonaMes;
-
-      const nivelEstrellaMes = {
-        labels: [''],
-        datasets: [{ data: [Math.ceil((puntuacionZonaMes * 5) / 100)] }],
-        chartOptions: this.chartOptionsNiveles
+      const newZona: any = {
+        numeroZonaSafe: nombre.split(' - ')[0].toLocaleLowerCase().replace(/ /g, '-'),
+        nombre: `${nombre.replace(' -', '')} - ${zona.area}`,
+        estrellasWeek,
+        estrellasMonth,
+        estrellasYear,
+        graficaMes: {
+          labels: [''],
+          datasets: [{ data: [estrellasMonth] }],
+          chartOptions: this.chartOptionsNiveles,
+        },
+        graficaAnio: {
+          labels: [''],
+          datasets: [{ data: [estrellasYear] }],
+          chartOptions: this.chartOptionsNiveles,
+        },
       };
 
-      const maxPuntuacionAnio = contenedoresCount * 5 * 4 * 12;
-      const puntuacionZonaAnio = (mediaAnio * 100) / maxPuntuacionAnio;
+      this.zonas.push(newZona);
+    }
 
-      const nivelEstrellaAnio = {
-        labels: [''],
-        datasets: [{ data: [Math.ceil((puntuacionZonaAnio * 5) / 100)] }],
-        chartOptions: this.chartOptionsNiveles
-      };
+    // Genero los datos del resumen mensual
+    this.resumenMensualChart.labels = this.zonas.map((x) => x.nombre);
+    this.resumenMensualChart.datasets = [{ data: this.zonas.map((x) => x.estrellasMonth) }];
 
-      // Cambiado según necesidades del cliente - 28/01/2020
-      nombre.startsWith('Zona 1 -') ? (nombre = 'Zona 1 - Manipulación de Materiales') : nombre;
+    // Genero los datos del resumen anual
+    this.resumenAnualChart.labels = this.zonas.map((x) => x.nombre);
+    this.resumenAnualChart.datasets = [{ data: this.zonas.map((x) => x.estrellasYear) }];
 
-      const newzona: RankinZonaData = {
-        contenedoresCount: contenedoresCount,
-        numeroZona: nombre.split(' - ')[0],
-        numeroZonaSafe: nombre
-          .split(' - ')[0]
-          .toLocaleLowerCase()
-          .replace(/ /g, '-'),
-        nombre: nombre.split(' - ')[1],
-        mediaMes: mediaMes || 0,
-        numEstrellaSemana: Math.floor(numEstrellaSemana),
-        nivelEstrellaMes: nivelEstrellaMes,
-        nivelEstrellaAnio: nivelEstrellaAnio,
-        puntuacionZonaMes: mediaMes,
-        maxPuntuacionMes: maxPuntuacionZonaMes,
-        puntuacionZonaAnio: mediaAnio,
-        maxPuntuacionAnio: maxPuntuacionAnio
-      };
-      this.zonas.push(newzona);
-    });
+    this.zonas.sort((a, b) => (a.estrellasMonth > b.estrellasMonth ? -1 : b.estrellasMonth > a.estrellasMonth ? 1 : 0));
 
-    this.chartPuntuacionMensual = {
-      labels: this.zonas.map(x => `${x.numeroZona} - ${x.nombre}`),
-      datasets: [
-        {
-          data: this.zonas.map(x => Math.ceil((x.puntuacionZonaMes * 5) / 100))
-        }
-      ]
-    };
-
-    this.chartPuntuacionAnual = {
-      labels: this.zonas.map(x => `${x.numeroZona} - ${x.nombre}`),
-      datasets: [
-        {
-          data: this.zonas.map(x => Math.ceil((x.puntuacionZonaAnio * 5) / 100))
-        }
-      ]
-    };
-
-    this.zonas.sort((a, b) => (a.mediaMes > b.mediaMes ? -1 : b.mediaMes > a.mediaMes ? 1 : 0));
+    return true;
   }
 
   flatten(arr: any) {
-    return arr.reduce(function(flat, toFlatten) {
+    return arr.reduce(function (flat, toFlatten) {
       return flat.concat(Array.isArray(toFlatten) ? this.flatten(toFlatten) : toFlatten);
     }, []);
   }

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DatesService {
   // today: string = '';
@@ -11,30 +11,23 @@ export class DatesService {
   locale: string = 'es';
 
   week: DateFromTo = {
-    from: moment(this.today)
-      .locale(this.locale)
-      .startOf('week'),
-    to: moment(this.today)
-      .locale(this.locale)
-      .endOf('week')
+    from: moment(this.today).locale(this.locale).startOf('week'),
+    to: moment(this.today).locale(this.locale).endOf('week'),
   };
 
+  // month: DateFromTo = {
+  //   from: moment(this.today).locale(this.locale).startOf('month'),
+  //   to: moment(this.today).locale(this.locale).endOf('month'),
+  // };
+
   month: DateFromTo = {
-    from: moment(this.today)
-      .locale(this.locale)
-      .startOf('month'),
-    to: moment(this.today)
-      .locale(this.locale)
-      .endOf('month')
+    from: moment(this.today).subtract(4, 'week'),
+    to: moment(this.today),
   };
 
   year: DateFromTo = {
-    from: moment(this.today)
-      .locale(this.locale)
-      .startOf('year'),
-    to: moment(this.today)
-      .locale(this.locale)
-      .endOf('year')
+    from: moment(this.today).locale(this.locale).startOf('year'),
+    to: moment(this.today).locale(this.locale).endOf('year'),
   };
 
   constructor() {}
@@ -44,7 +37,7 @@ export class DatesService {
   getYear = () => this.year;
 }
 
-interface DateFromTo {
+export interface DateFromTo {
   from: moment.Moment;
   to: moment.Moment;
 }

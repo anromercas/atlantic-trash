@@ -1,0 +1,285 @@
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Contenedor } from 'src/app/interface/contenedor.interface';
+import { ESTADOS } from 'src/app/data/data.estados';
+import { RESIDUOS } from 'src/app/data/data.residuos';
+import { DatesService } from 'src/app/services/dates.service';
+import { Historico } from 'src/app/interface/historico.interface';
+
+import 'array-flat-polyfill';
+
+import * as moment from 'moment';
+import { HistoricoService } from 'src/app/services/historico.service';
+
+@Component({
+  selector: 'app-problemas-residuos',
+  templateUrl: './problemas-residuos.component.html',
+  styleUrls: ['./problemas-residuos.component.css'],
+})
+export class ProblemasResiduosComponent implements OnInit {
+  // @Input() contenedores: Contenedor[];
+  @Output() onLoaded = new EventEmitter<boolean>();
+
+  estados: any[] = ESTADOS;
+  problemasResiduos: Residuo[] = [];
+  Problema: Problema;
+  ProblemaBueno: Problema;
+
+  residuoActual: string = '';
+  estadoActual: string = '';
+
+  RESIDUOS = RESIDUOS;
+
+  // resumenMes: {
+  //   labels: string[];
+  //   datasets: any[];
+  // };
+  // resumenAnio: {
+  //   labels: string[];
+  //   datasets: any[];
+  // };
+
+  // resumenMesOptions = {
+  //   responsive: true,
+  //   aspectRatio: 1,
+  //   scales: {
+  //     xAxes: [
+  //       {
+  //         ticks: {
+  //           beginAtZero: true,
+  //           max: 5,
+  //         },
+  //       },
+  //     ],
+  //   },
+  // };
+
+  // resumenAnioOptions = {
+  //   responsive: true,
+  //   aspectRatio: 1,
+  //   scales: {
+  //     xAxes: [
+  //       {
+  //         ticks: {
+  //           beginAtZero: true,
+  //           max: 5,
+  //         },
+  //       },
+  //     ],
+  //   },
+  // };
+
+  loaded: boolean = false;
+  week: { from: moment.Moment; to: moment.Moment };
+  month: { from: moment.Moment; to: moment.Moment };
+  year: { from: moment.Moment; to: moment.Moment };
+  allHistoricos: Historico[];
+
+  constructor(private historicoService: HistoricoService) {
+    this.week = {
+      from: moment().startOf('week').startOf('day'),
+      to: moment().endOf('week').endOf('day'),
+    };
+    this.month = {
+      from: moment().startOf('month').startOf('day'),
+      to: moment().endOf('month').endOf('day'),
+    };
+    this.year = {
+      from: moment().subtract(12, 'month').startOf('day'),
+      to: moment().endOf('day'),
+    };
+  }
+
+  async ngOnInit() {
+    // const minDate = this.year.from;
+    // const maxDate = this.week.to.isSameOrAfter(this.month.to) ? this.week.to : this.month.to;
+
+    // const result = await this.historicoService.getHistoricoResiduo(minDate, maxDate).toPromise();
+
+    // this.allHistoricos = result.historicos;
+
+    // // console.log(result);
+    // // return;
+
+    // const contenedoresSet = new Set(this.allHistoricos.map((x) => x.nombre));
+
+    // const resumenMes: any[] = [];
+    // const resumenAnio: any[] = [];
+
+    // const historicosMes = this.allHistoricos
+    //   // .filter((x) => x.historico !== undefined)
+    //   // .filter((x) => x.historico.length > 0)
+    //   // .flatMap((x) => x.historico)
+    //   .filter((x: Historico) => x.fecha != null && moment(x.fecha).isBetween(this.month.from, this.month.to));
+
+    // let maxPuntuacionResiduoZonaMes = historicosMes.reduce((a: number, b: Historico) => a + b.calificacion, 0);
+
+    // for (let residuo of this.RESIDUOS) {
+    //   // console.log('residuo: ', residuo.nombre);
+
+    //   const resultYear = await this.historicoService
+    //     .getHistoricoResiduo(this.year.from, this.year.to, residuo.nombre)
+    //     .toPromise();
+    //   // console.log(resultYear);
+    // }
+
+    for (let residuo of this.RESIDUOS) {
+      const contenedorNombre = residuo.nombre;
+      const contenedorImagen = residuo.img.toLowerCase();
+
+      this.residuoActual = contenedorNombre;
+      // // Obtenemos los distintos contenedores del mismo tipo
+      // const historicoResiduosEstados = this.allHistoricos.filter(
+      //   (contenedor: Contenedor) => contenedor.nombre === residuo.nombre
+      // );
+      // console.log(historicoResiduosEstados[0].nombre);
+      // const contenedorImagen: string = historicoResiduosEstados[0].imgContenedor;
+
+      //  historicoResiduosEstados = historicoResiduosEstados;
+      // .filter((x) => x.historico !== undefined)
+      // .filter((x) => x.historico.length > 0)
+      // .flatMap((x) => x.historico);
+
+      let problemas: Problema[] = [];
+
+      for (let estado of this.estados) {
+        // debugger;
+        const nombreEstado = estado.nombre;
+
+        this.estadoActual = nombreEstado;
+
+        // const resultWeek = await this.historicoService
+        //   .getHistoricoResiduo(this.week.from, this.week.to, residuo.nombre)
+        //   .toPromise();
+        const resultWeekState = await this.historicoService
+          .getHistoricoResiduo(this.week.from, this.week.to, residuo.nombre, nombreEstado)
+          .toPromise();
+        const week = resultWeekState.historicos.length;
+
+        const resultMonth = await this.historicoService
+          .getHistoricoResiduo(this.month.from, this.month.to, residuo.nombre)
+          .toPromise();
+        const resultMonthState = await this.historicoService
+          .getHistoricoResiduo(this.month.from, this.month.to, residuo.nombre, nombreEstado)
+          .toPromise();
+        const month = resultMonthState.historicos.length;
+        const maxPuntuacionResiduoZonaMes = resultMonth.historicos.length * 5;
+
+        // const resultYear = await this.historicoService
+        //   .getHistoricoResiduo(this.year.from, this.year.to, residuo.nombre)
+        //   .toPromise();
+        const resultYearState = await this.historicoService
+          .getHistoricoResiduo(this.year.from, this.year.to, residuo.nombre, nombreEstado)
+          .toPromise();
+        const year = resultYearState.historicos.length;
+
+        const puntuacionProblema = resultMonthState.historicos.reduce(
+          (x: number, y: Historico) => x + y.calificacion || 0,
+          0
+        );
+
+        // debugger;
+        const puntuacionProblemaPercent = (puntuacionProblema * 100) / maxPuntuacionResiduoZonaMes || 0;
+
+        let puntuacion = (puntuacionProblemaPercent * 5) / 100;
+
+        puntuacion = Math.round(puntuacion);
+
+        const problema: Problema = {
+          name: nombreEstado,
+          month: month,
+          iconosRellenos: Array(5)
+            .fill(0)
+            .map((x, idx) => {
+              return idx < puntuacion ? 1 : 0;
+            }),
+          puntuacion: puntuacion,
+          week: week,
+          year: year,
+        };
+
+        problemas.push(problema);
+      }
+
+      this.ProblemaBueno = problemas.filter((x) => x.name == 'Bueno')[0];
+      problemas = problemas.filter((x) => x.name != 'Bueno');
+
+      const problemaResiduo = {
+        nombre: contenedorNombre.replace(
+          /(?:^|(?=[^']).\b)(Contenedor|Cuba|Envases|GRG|de|Cajas|Arcón|Bidón|Sacas|para|Jaula)\b/gi,
+          ''
+        ),
+        imagen: contenedorImagen,
+        problemas: problemas,
+      };
+
+      this.problemasResiduos.push(problemaResiduo);
+
+      const historicoContendoresMes = await this.historicoService
+        .getHistoricoResiduo(this.month.from, this.month.to, residuo.nombre)
+        .toPromise();
+      const maxPuntuacionMes = historicoContendoresMes.historicos.length * 5;
+      const calificacionMes = historicoContendoresMes.historicos.reduce((x, y) => x + y.calificacion, 0);
+
+      // maxPuntuacionMes - 100
+      // calificacionMes - x
+
+      // let xMes = (calificacionMes * 100) / maxPuntuacionMes || 0;
+
+      // resumenMes.push({
+      //   nombre: problemaResiduo.nombre,
+      //   // value: Math.ceil((calificacionMes * 5) / 100) || 0,
+      //   value: Math.round(((xMes * 5) / 100 || 0 + Number.EPSILON) * 100) / 100,
+      // });
+
+      // const historicoContendoresAnio = await this.historicoService
+      //   .getHistoricoResiduo(this.year.from, this.year.to, residuo.nombre)
+      //   .toPromise();
+      // const maxPuntuacionAnio =
+      //   historicoContendoresAnio.historicos.filter((x) => moment(x.fecha).isBetween(this.year.from, this.year.to))
+      //     .length * 5;
+      // const calificacionAnio = historicoContendoresAnio.historicos.reduce((x, y) => x + y.calificacion, 0);
+
+      // let xAnio = (calificacionAnio * 100) / maxPuntuacionAnio || 0;
+
+      // // const value = Math.round(((xAnio * 5) / 100 || 0 + Number.EPSILON) * 100) / 100;
+
+      // resumenAnio.push({
+      //   nombre: problemaResiduo.nombre,
+      //   // value: Math.ceil((calificacionAnio * 5) / 100) || 0,
+      //   value: Math.round(((xAnio * 5) / 100 || 0 + Number.EPSILON) * 100) / 100,
+      // });
+
+      // this.loaded = true;
+      // this.onLoaded.emit(true);
+      // return;
+    }
+
+    // this.resumenMes = {
+    //   labels: resumenMes.map((x) => x.nombre),
+    //   datasets: [{ data: resumenMes.map((x) => x.value) }],
+    // };
+
+    // this.resumenAnio = {
+    //   labels: resumenAnio.map((x) => x.nombre),
+    //   datasets: [{ data: resumenAnio.map((x) => x.value) }],
+    // };
+
+    this.loaded = true;
+    this.onLoaded.emit(true);
+  }
+}
+
+interface Residuo {
+  nombre: string;
+  imagen: string;
+  problemas: Problema[];
+}
+
+interface Problema {
+  name: string;
+  week: number;
+  month: number;
+  year: number;
+  puntuacion: number;
+  iconosRellenos: number[];
+}

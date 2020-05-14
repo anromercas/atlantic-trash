@@ -1,134 +1,134 @@
 export const RESIDUOS = [
   {
     nombre: 'RSU',
-    img: './assets/residuos/RSU.png',
+    img: 'RSU.png',
     seleccionado: false,
-    color: ''
+    color: '',
   },
   {
-    nombre: 'Elementos Filtrantes Absorbentes Contaminados',
-    img: './assets/residuos/residuo-filtrante-absorbente-contaminado.png',
+    nombre: 'Bidón Elementos Filtrantes Absorbente Contaminado',
+    img: 'residuo-filtrante-absorbente-contaminado.png',
     seleccionado: false,
-    color: ''
+    color: '',
   },
   {
     nombre: 'Cajas Madera',
-    img: './assets/residuos/cajas-madera.png',
+    img: 'cajas-madera.png',
     seleccionado: false,
-    color: ''
+    color: '',
   },
   {
     nombre: 'Chatarra',
-    img: './assets/residuos/chatarra.png',
+    img: 'chatarra.png',
     seleccionado: false,
-    color: ''
-  },
-  {
-    nombre: 'Envases Contaminados',
-    img: './assets/residuos/plastico-envases-contaminados.png',
-    seleccionado: false,
-    color: ''
-  },
-  {
-    nombre: 'Envases Metálicos Contaminados',
-    img: './assets/residuos/envases-metalicos-contaminados.png',
-    seleccionado: false,
-    color: ''
-  },
-  {
-    nombre: 'EPIs',
-    img: './assets/residuos/epis.png',
-    seleccionado: false,
-    color: ''
-  },
-  {
-    nombre: 'EPIs Contaminados',
-    img: './assets/residuos/epis-contaminados.png',
-    seleccionado: false,
-    color: ''
-  },
-  {
-    nombre: 'Papel y Cartón',
-    img: './assets/residuos/papel-y-carton.png',
-    seleccionado: false,
-    color: ''
+    color: '',
   },
   {
     nombre: 'Plástico/envases Contaminados',
-    img: './assets/residuos/plastico-envases-contaminados.png',
+    img: 'plastico-envases-contaminados.png',
     seleccionado: false,
-    color: ''
+    color: '',
+  },
+  {
+    nombre: 'Envases Metálicos Contaminados',
+    img: 'envases-metalicos-contaminados.png',
+    seleccionado: false,
+    color: '',
+  },
+  {
+    nombre: 'EPIs',
+    img: 'epis.png',
+    seleccionado: false,
+    color: '',
+  },
+  {
+    nombre: 'EPIs Contaminados',
+    img: 'epis-contaminados.png',
+    seleccionado: false,
+    color: '',
+  },
+  {
+    nombre: 'Papel y Cartón',
+    img: 'papel-y-carton.png',
+    seleccionado: false,
+    color: '',
+  },
+  {
+    nombre: 'Plástico/envases Contaminados',
+    img: 'plastico-envases-contaminados.png',
+    seleccionado: false,
+    color: '',
   },
   {
     nombre: 'Plástico/envases NO Contaminados',
-    img: './assets/residuos/plastico-envases-NO-contaminados.png',
+    img: 'plastico-envases-NO-contaminados.png',
     seleccionado: false,
-    color: ''
+    color: '',
   },
   {
     nombre: 'RAEE',
-    img: './assets/residuos/RAEE.png',
+    img: 'RAEE.png',
     seleccionado: false,
-    color: ''
+    color: '',
   },
   {
     nombre: 'Toner',
-    img: './assets/residuos/toner.png',
+    img: 'toner.png',
     seleccionado: false,
-    color: ''
+    color: '',
   },
   {
     nombre: 'Trapos',
-    img: './assets/residuos/trapos.png',
+    img: 'trapos.png',
     seleccionado: false,
-    color: ''
+    color: '',
   },
   {
     nombre: 'Tubos Fluorescentes',
-    img: './assets/residuos/tubos-fluorescentes.png',
+    img: 'tubos-fluorescentes.png',
     seleccionado: false,
-    color: ''
+    color: '',
   },
   {
     nombre: 'Chatarra Cu y/o Fe',
-    img: './assets/residuos/chatarra-cu-y-o-fe.png',
+    img: 'chatarra-cu-y-o-fe.png',
     seleccionado: false,
-    color: ''
+    color: '',
   },
   {
-    nombre: 'Calorifugado',
-    img: './assets/residuos/calorifugado.png',
+    nombre: 'de Calorifugado',
+    img: 'calorifugado.png',
     seleccionado: false,
-    color: ''
+    color: '',
   },
   {
     nombre: 'Madera',
-    img: './assets/residuos/madera.png',
+    img: 'madera.png',
     seleccionado: false,
-    color: ''
+    color: '',
   },
   {
-    nombre: 'Refractario NP',
-    img: './assets/residuos/refractario.png',
+    nombre: 'de Refractario NP',
+    img: 'refractario.png',
     seleccionado: false,
-    color: ''
+    color: '',
   },
   {
     nombre: 'Sacas Contaminadas',
-    img: './assets/residuos/sacas-contaminadas.png',
+    img: 'sacas-contaminadas.png',
     seleccionado: false,
-    color: ''
+    color: '',
   },
   {
     nombre: 'GRG Refractario Peligroso',
-    img: './assets/residuos/refractario-contaminado.png',
+    img: 'refractario-contaminado.png',
     seleccionado: false,
-    color: ''
+    color: '',
   },
-  {
-    nombre: 'Otros (Rellene Observaciones)',
-    img: './assets/residuos/basura.png',
-    seleccionado: false,
-    color: ''
-  }
+  // {
+  //   nombre: 'Otros (Rellene Observaciones)',
+  //   img: 'basura.png',
+  //   seleccionado: false,
+  //   color: '',
+  // },
 ];

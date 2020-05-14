@@ -25,21 +25,20 @@ const pagesRoutes: Routes = [
       { path: 'listado-contenedores', component: ListadoBasurasComponent },
       {
         path: 'listado-contenedores/:zonaId',
-        component: ListadoBasurasComponent
+        component: ListadoBasurasComponent,
       },
       { path: 'mala-segregacion/:zonaId', component: MalaSegregacionComponent },
       { path: 'listado-zonas', component: ListadoZonasComponent },
       { path: 'ficha-contenedor/:id', component: FichaContenedorComponent },
       {
         path: 'formulario-contenedor',
-        component: FormularioContenedorComponent
+        component: FormularioContenedorComponent,
       },
       { path: 'informe', component: InformeComponent },
-      { path: 'test-page', component: PageTestComponent },
-      { path: 'test-page/:zonaId', component: PageTestComponent },
-      { path: '', redirectTo: '/dashboard', pathMatch: 'full' }
-    ]
-  }
+      { path: 'test', component: PageTestComponent },
+      { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+    ],
+  },
 ];
 
 export const PAGES_ROUTES = RouterModule.forChild(pagesRoutes);

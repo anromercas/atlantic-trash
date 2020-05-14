@@ -5,97 +5,126 @@
         <h1>Problemas del contenedor por zonas</h1>
       </div>
     </div>
-    <div class="row">
-      <div class="col-xs-12 col-md-6">
-        <h2>Resumen Mensual</h2>
-        <canvas baseChart [datasets]="resumenMes.datasets" [labels]="resumenMes.labels" [options]="chartOptions"
-          charType="horizontalBar" [legend]="false" chartType="horizontalBar"></canvas>
-      </div>
-      <div class="col-xs-12 col-md-6">
-        <h2>Resumen Anual</h2>
-        <canvas baseChart [datasets]="resumenAnio.datasets" [labels]="resumenAnio.labels" [options]="chartOptions"
-          charType="horizontalBar" [legend]="false" chartType="horizontalBar"></canvas>
+    <div *ngIf="loaded; else cargandoDatos">
+      <!-- <div class="row">
+        <div class="col-xs-12 col-md-6">
+          <h2>Resumen Mensual</h2>
+          <canvas
+            baseChart
+            [datasets]="resumenMes.datasets"
+            [labels]="resumenMes.labels"
+            [options]="chartOptions"
+            charType="horizontalBar"
+            [legend]="false"
+            chartType="horizontalBar"
+          ></canvas>
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <h2>Resumen Anual</h2>
+          <canvas
+            baseChart
+            [datasets]="resumenAnio.datasets"
+            [labels]="resumenAnio.labels"
+            [options]="chartOptions"
+            charType="horizontalBar"
+            [legend]="false"
+            chartType="horizontalBar"
+          ></canvas>
+        </div>
+      </div> -->
+      <div class="row">
+        <div class="col-12 contenedor-zona-container" *ngFor="let zona of contenedoresPorZonas">
+          <div class="row background-blue" style="padding: 24px;">
+            <div class="col-xs-12">
+              <h2 style="color: white;">{{ zona.nombre }}</h2>
+            </div>
+          </div>
+          <div class="row background-blue">
+            <div class="text-right col-12">
+              Total Contenedores (Mes): <b>{{ zona.contenedoresCount }}</b>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <table class="table table-striped">
+                <thead class="thead-light">
+                  <th>Problema</th>
+                  <th>Semana</th>
+                  <th>Mes</th>
+                  <th>Año</th>
+                  <th>Puntuacion mensual</th>
+                </thead>
+                <tbody>
+                  <tr style="background-color: white;">
+                    <td>{{ ProblemaBueno.name }}</td>
+                    <td>{{ ProblemaBueno.week }}</td>
+                    <td>{{ ProblemaBueno.month }}</td>
+                    <td>{{ ProblemaBueno.year }}</td>
+                    <td>
+                      <div class="d-flex align-items-center no-block">
+                        <div style="display: inherit;">
+                          <div
+                            *ngFor="let number of ProblemaBueno.iconosRellenos"
+                            width="16px"
+                            [ngClass]="{
+                              'coin-icon': number,
+                              'coin-original-icon': !number
+                            }"
+                          ></div>
+                        </div>
+                        <span class="numero-calificacion">
+                          {{ ProblemaBueno.puntuacion }}
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="100%">
+                      <p></p>
+                    </td>
+                  </tr>
+                  <tr *ngFor="let problema of zona.problemas">
+                    <td>{{ problema.name }}</td>
+                    <td>{{ problema.week }}</td>
+                    <td>{{ problema.month }}</td>
+                    <td>{{ problema.year }}</td>
+                    <td>
+                      <div class="d-flex align-items-center no-block">
+                        <div style="display: inherit;">
+                          <div
+                            *ngFor="let number of problema.iconosRellenos"
+                            width="16px"
+                            [ngClass]="{
+                              'coin-icon': number,
+                              'coin-original-icon': !number
+                            }"
+                          ></div>
+                        </div>
+                        <span class="numero-calificacion">
+                          {{ problema.puntuacion }}
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="align-items-center row" style="padding: 24px;">
+            <div class="col-8">
+              <span>Calidad segregación: {{ zona.segregracion }}</span>
+            </div>
+            <div class="col-4 text-right">
+              <a [routerLink]="['/mala-segregacion', zona.nombre]" class="btn btn-primary">ver detalle</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-12 contenedor-zona-container" *ngFor="let zona of contenedoresPorZonas">
-        <div class="row background-blue" style="padding: 24px">
-          <div class="col-xs-12">
-            <h2 style="color: white">{{ zona.nombre }}</h2>
-          </div>
-        </div>
-        <div class="row background-blue">
-          <div class="text-right col-12">
-            Total Contenedores: <b>{{ zona.contenedoresCount }}</b>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-12">
-            <table class="table table-striped">
-              <thead class="thead-light">
-                <th>Problema</th>
-                <th>Semana</th>
-                <th>Mes</th>
-                <th>Año</th>
-                <th>Puntuacion mensual</th>
-              </thead>
-              <tbody>
-                <tr style="background-color: white">
-                  <td>{{ ProblemaBueno.name }}</td>
-                  <td>{{ ProblemaBueno.week }}</td>
-                  <td>{{ ProblemaBueno.month }}</td>
-                  <td>{{ ProblemaBueno.year }}</td>
-                  <td>
-                    <div class="d-flex align-items-center no-block">
-                      <div style="display:inherit">
-                        <div *ngFor="let number of ProblemaBueno.iconosRellenos" width="16px" [ngClass]="{
-                            'coin-icon': number,
-                            'coin-original-icon': !number
-                          }"></div>
-                      </div>
-                      <span class="numero-calificacion">
-                        {{ ProblemaBueno.puntuacion }}
-                      </span>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td colspan="100%">
-                    <p>
-                  </td>
-                </tr>
-                <tr *ngFor="let problema of zona.problemas">
-                  <td>{{ problema.name }}</td>
-                  <td>{{ problema.week }}</td>
-                  <td>{{ problema.month }}</td>
-                  <td>{{ problema.year }}</td>
-                  <td>
-                    <div class="d-flex align-items-center no-block">
-                      <div style="display:inherit">
-                        <div *ngFor="let number of problema.iconosRellenos" width="16px" [ngClass]="{
-                            'coin-icon': number,
-                            'coin-original-icon': !number
-                          }"></div>
-                      </div>
-                      <span class="numero-calificacion">
-                        {{ problema.puntuacion }}
-                      </span>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="align-items-center row" style="padding: 24px">
-          <div class="col-8">
-            <span>Calidad segregación: {{ zona.segregracion }}</span>
-          </div>
-          <div class="col-4 text-right">
-            <a [routerLink]="['/mala-segregacion', zona.nombre]" class="btn btn-primary">ver detalle</a>
-          </div>
-        </div>
+    <ng-template #cargandoDatos>
+      <div>
+        <span>Cargando datos...</span>
       </div>
-    </div>
+    </ng-template>
   </div>
 </div>

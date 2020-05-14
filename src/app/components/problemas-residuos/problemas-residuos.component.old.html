@@ -36,8 +36,8 @@
         <div class="col-12 zona-container" *ngFor="let zona of problemasResiduos">
           <div class="row align-items-center">
             <div class="col-xs-2">
-              <img [src]="'/assets/images/contenedores/contenedor-' + zona.imagen" class="contenedor-ico" />
-              <!-- <img [src]="'/assets/images/contenedores/' + zona.imagen" class="contenedor-ico" /> -->
+              <!-- <img [src]="'/assets/images/contenedores/contenedor-' + zona.imagen" class="contenedor-ico" /> -->
+              <img [src]="'/assets/images/contenedores/' + zona.imagen" class="contenedor-ico" />
             </div>
             <div class="col-xs-10">
               <span class="label-zona-nombre">{{ zona.nombre }}</span>
@@ -114,7 +114,7 @@
     </div>
   </div>
   <ng-template #cargandoDatosDiv>
-    <span>Cargando datos...</span>
-    <!-- <span>Cargando datos..</span> -->
+    <!-- <span>Cargando datos... {{ residuoActual }} ({{ estadoActual }})</span> -->
+    <span>Cargando datos..</span>
   </ng-template>
 </div>

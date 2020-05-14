@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ChartData, ChartDataSets, ChartOptions } from 'chart.js';
 
 import { Contenedor } from 'src/app/interface/contenedor.interface';
@@ -15,7 +15,9 @@ import { RESIDUOS } from 'src/app/data/data.residuos';
   styleUrls: ['./ranking-residuos.component.css'],
 })
 export class RankingResiduosComponent implements OnInit {
-  @Input() contenedores: Contenedor[];
+  // @Input() contenedores: Contenedor[];
+  @Output() onLoaded = new EventEmitter<boolean>();
+
   rankingResiduos: RakingResiduoData[] = [];
   problemasComunes: ProblemasComunes[] = [];
   month: any;
@@ -70,7 +72,7 @@ export class RankingResiduosComponent implements OnInit {
   resumenAnio: any;
 
   loaded: boolean = false;
-  historico: Historico[];
+  historico: Historico[] = [];
 
   constructor(private dateService: DatesService, private historicoService: HistoricoService) {
     this.month = this.dateService.getMonth();
@@ -78,12 +80,15 @@ export class RankingResiduosComponent implements OnInit {
   }
 
   async ngOnInit() {
-    await this.getHistorico();
+    await this.composeGraficas();
+
+    // await this.getHistorico();
+
     this.composeEstrellas();
     this.composeGraficaResiduos();
-    this.composeGraficas();
 
     this.loaded = true;
+    this.onLoaded.emit(true);
   }
 
   tieneProblemasContendor(nombre: string): boolean {
@@ -102,25 +107,24 @@ export class RankingResiduosComponent implements OnInit {
 
     for (const residuo of RESIDUOS) {
       try {
-        const response = await this.historicoService.getHistoricoResiduo(
-          this.dateService.year.from,
-          this.dateService.year.to,
-          residuo.nombre
-        );
+        const response = await this.historicoService
+          .getHistoricoResiduo(this.dateService.year.from, this.dateService.year.to, residuo.nombre)
+          .toPromise();
         const historicoResiduo = response.historicos || [];
         historico = historico.concat(historicoResiduo);
       } finally {
       }
     }
 
-    this.historico = historico;
+    console.log(historico);
+    // this.historico = historico;
   }
 
   async getHistoricoPorFecha(nombreResiduo: string, from: moment.Moment, to: moment.Moment) {
     let historico: Historico[] = [];
 
     try {
-      const response = await this.historicoService.getHistoricoResiduo(from, to, nombreResiduo);
+      const response = await this.historicoService.getHistoricoResiduo(from, to, nombreResiduo).toPromise();
       const historicoResiduo = response.historicos || [];
       historico = historico.concat(historicoResiduo);
     } finally {
@@ -136,8 +140,8 @@ export class RankingResiduosComponent implements OnInit {
     for (const residuo of RESIDUOS) {
       const contenedoresPuntuadosMes = await this.getHistoricoPorFecha(
         residuo.nombre,
-        this.dateService.month.from,
-        this.dateService.month.to
+        moment().subtract(4, 'week'),
+        moment()
       );
       const contenedoresPuntuadosAnio = await this.getHistoricoPorFecha(
         residuo.nombre,
@@ -148,23 +152,27 @@ export class RankingResiduosComponent implements OnInit {
       const historicoResiduoMes = contenedoresPuntuadosMes.filter((x) => x.nombre.includes(residuo.nombre));
       const historicoResiduoAnio = contenedoresPuntuadosAnio.filter((x) => x.nombre.includes(residuo.nombre));
 
-      const longitudMes = historicoResiduoMes.length;
-      const longitudAnio = historicoResiduoAnio.length;
+      this.historico = this.historico.concat(historicoResiduoAnio);
+
+      const longitudMes = historicoResiduoMes.length * 5;
+      const longitudAnio = historicoResiduoAnio.length * 5;
 
       const sumaMes = historicoResiduoMes.reduce((prev, current) => prev + current.calificacion, 0);
       const sumaAnio = historicoResiduoAnio.reduce((prev, current) => prev + current.calificacion, 0);
 
-      const calculoMes = sumaMes / (longitudMes * 5);
-      const calculoAnio = sumaAnio / (longitudAnio * 5);
+      const calculoMes = (sumaMes * 5) / longitudMes; // sumaMes / (longitudMes * 5);
+      const calculoAnio = (sumaAnio * 5) / longitudAnio; // sumaAnio / (longitudAnio * 5);
 
+      const valueMonth = Math.round((calculoMes || 0 + Number.EPSILON) * 100) / 100;
       resumenMes.push({
         nombre: (residuo && residuo.nombre) || '',
-        value: Math.round(calculoMes * 5) || 0,
+        value: valueMonth || 0,
       });
 
+      const valueYear = Math.round((calculoAnio || 0 + Number.EPSILON) * 100) / 100;
       resumenAnio.push({
         nombre: residuo.nombre,
-        value: Math.round(calculoAnio * 5) || 0,
+        value: valueYear || 0,
       });
     }
 
@@ -188,50 +196,62 @@ export class RankingResiduosComponent implements OnInit {
     for (const residuo of RESIDUOS) {
       const historicoResiduo = this.historico.filter((x) => x.nombre.includes(residuo.nombre));
 
-      const contenedoresPuntuados = this.contenedores.filter((x) => x.calificacion > 0).length;
+      // const contenedoresPuntuados = this.historico.filter((x) => x.calificacion > 0).length;
 
       if (historicoResiduo.length > 0) {
         // Calculamos la puntuacion de la semana
-        const maxPuntuacionSemana = this.contenedores.filter((x) => x.nombre.includes(residuo.nombre)).length * 5;
-        const calificacionTotal = historicoResiduo
+        const maxPuntuacionSemana =
+          historicoResiduo.filter((x) =>
+            moment(x.fecha).isBetween(this.dateService.week.from, this.dateService.week.to)
+          ).length * 5;
+
+        const calificacionSemana = historicoResiduo
           .filter(
             (x) => x.fecha != null && moment(x.fecha).isBetween(this.dateService.week.from, this.dateService.week.to)
           )
           .reduce((a, b) => a + b.calificacion, 0);
-        const calificacion = calificacionTotal / contenedoresPuntuados;
-        const calificacionSemanaPercent = Math.round(calificacion * 100);
-        const nivelEstrellaSemana = (calificacionSemanaPercent * 5) / 100;
+        let puntuacionSemanaPorcentaje = (calificacionSemana * 100) / maxPuntuacionSemana || 0;
+        puntuacionSemanaPorcentaje = Math.round((puntuacionSemanaPorcentaje || 0 + Number.EPSILON) * 100) / 100;
+        const calificacionSemanaPercent = (puntuacionSemanaPorcentaje * 100) / 5;
+
+        // const calificacionSemanaPercent = Math.round(calificacion * 100);
+        // const nivelEstrellaSemana = (calificacionSemanaPercent * 5) / 100;
 
         // Calculamos la puntuacion del mes
-        const maxPuntuacionMes = maxPuntuacionSemana * 4;
+        const maxPuntuacionMes =
+          historicoResiduo.filter((x) => moment(x.fecha).isBetween(moment().subtract(4, 'week'), moment())).length * 5; // maxPuntuacionSemana * 4;
         const mediaMes = historicoResiduo
-          .filter(
-            (x) => x.fecha != null && moment(x.fecha).isBetween(this.dateService.month.from, this.dateService.month.to)
-          )
+          .filter((x) => moment(x.fecha).isBetween(moment().subtract(4, 'week'), moment()))
           .reduce((a, b) => a + b.calificacion, 0);
-        const puntuacionMes = (mediaMes * 100) / maxPuntuacionMes;
+        let puntuacionMesPorcentaje = (mediaMes * 100) / maxPuntuacionMes || 0;
+        puntuacionMesPorcentaje = Math.round((puntuacionMesPorcentaje || 0 + Number.EPSILON) * 100) / 100;
+        let calificacionMes = (puntuacionMesPorcentaje * 5) / 100;
+        calificacionMes = Math.round((calificacionMes || 0 + Number.EPSILON) * 100) / 100;
 
         // Generamos grafica nivelEstrellaMes
-        const nivelEstrellaMes = {
+        const nivelEstrellaMes: ChartData = {
           labels: [''],
-          datasets: [{ data: [Math.ceil((puntuacionMes * 5) / 100)] }],
-          chartOptions: this.chartOptionsNiveles,
+          datasets: [{ data: [calificacionMes] }],
+          // chartOptions: this.chartOptionsNiveles,
         };
         // const nivelEstrellaMes = (puntuacionMes * 5) / 100;
 
         // Calculamos la puntuacion del año
-        const maxPuntuacionAnio = maxPuntuacionMes * 12;
+        const maxPuntuacionAnio =
+          historicoResiduo.filter((x) => moment(x.fecha).isBetween(moment().subtract(12, 'month'), moment())).length *
+          5;
         const mediaAnio = historicoResiduo
-          .filter(
-            (x) => x.fecha != null && moment(x.fecha).isBetween(this.dateService.year.from, this.dateService.year.to)
-          )
+          .filter((x) => moment(x.fecha).isBetween(moment().subtract(12, 'month'), moment()))
           .reduce((a, b) => a + b.calificacion, 0);
-        const puntuacionAnio = (mediaAnio * 100) / maxPuntuacionAnio;
+        let puntuacionAnioPorcentaje = (mediaAnio * 100) / maxPuntuacionAnio || 0;
+        puntuacionAnioPorcentaje = Math.round((puntuacionAnioPorcentaje || 0 + Number.EPSILON) * 100) / 100;
+        let calificacionAnio = (puntuacionAnioPorcentaje * 5) / 100;
+        calificacionAnio = Math.round((calificacionAnio || 0 + Number.EPSILON) * 100) / 100;
 
-        const nivelEstrellaAnio = {
+        const nivelEstrellaAnio: ChartData = {
           labels: [''],
-          datasets: [{ data: [Math.ceil((puntuacionAnio * 5) / 100)] }],
-          chartOptions: this.chartOptionsNiveles,
+          datasets: [{ data: [calificacionAnio] }],
+          // chartOptions: this.chartOptionsNiveles,
         };
         // const nivelEstrellaAnio = (puntuacionAnio * 5) / 100;
 
@@ -239,32 +259,26 @@ export class RankingResiduosComponent implements OnInit {
           nombre: residuo.nombre,
           imgContenedor: historicoResiduo[0].imgContenedor,
           media: calificacionSemanaPercent,
-          nivelEstrellaSemana: Math.ceil(nivelEstrellaSemana),
+          nivelEstrellaSemana: Math.ceil(calificacionSemanaPercent),
           nivelEstrellaMes: nivelEstrellaMes, //  Math.ceil(nivelEstrellaMes),
           nivelEstrellaAnio: nivelEstrellaAnio, // Math.ceil(nivelEstrellaAnio)
-        });
-
-        resumenMes.push({
-          nombre: (residuo && residuo.nombre) || '',
-          value: Math.ceil((puntuacionMes * 5) / 100) || 0,
-        });
-
-        resumenAnio.push({
-          nombre: residuo.nombre,
-          value: Math.ceil((puntuacionAnio * 5) / 100) || 0,
+          chartOptions: this.chartOptionsNiveles,
         });
       }
     }
 
-    this.resumenMes = {
-      labels: resumenMes.map((x) => x.nombre),
-      datasets: [{ data: resumenMes.map((x) => x.value) }],
-    };
+    // this.resumenMes = {
+    //   labels: resumenMes.map((x) => x.nombre),
+    //   datasets: [{ data: resumenMes.map((x) => x.value) }],
+    // };
 
-    this.resumenAnio = {
-      labels: resumenAnio.map((x) => x.nombre),
-      datasets: [{ data: resumenAnio.map((x) => x.value) }],
-    };
+    // this.resumenAnio = {
+    //   labels: resumenAnio.map((x) => x.nombre),
+    //   datasets: [{ data: resumenAnio.map((x) => x.value) }],
+    // };
+
+    // console.log(this.resumenMes);
+    // console.log(this.resumenAnio);
 
     this.isLoading = false;
   }
@@ -341,6 +355,7 @@ interface RakingResiduoData {
   nivelEstrellaSemana: number;
   nivelEstrellaMes: ChartData;
   nivelEstrellaAnio: ChartData;
+  chartOptions: ChartOptions;
 }
 
 interface ProblemasComunes {

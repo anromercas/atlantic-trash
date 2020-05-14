@@ -11,7 +11,7 @@ import { LoadingService } from 'src/app/services/loading.service';
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
   contenedores: Contenedor[] = [];
@@ -29,6 +29,9 @@ export class DashboardComponent implements OnInit {
   problemasComunes: any;
   isLoaded: boolean = false;
 
+  zonasCargadas: number = 0;
+  numerosZonas: number = 4;
+
   constructor(
     public router: Router,
     private _basuraService: ContenedorService,
@@ -43,13 +46,22 @@ export class DashboardComponent implements OnInit {
 
     this._loadingService.show();
     this._basuraService.getAll(true).subscribe(async (data: any) => {
-      setTimeout(() => {
-        this.contenedores = data;
-        setTimeout(() => {
-          this._loadingService.hide();
-          this.isLoaded = true;
-        }, 1000);
-      }, 2000);
+      // setTimeout(() => {
+      this.contenedores = data;
+      // setTimeout(() => {
+      // this._loadingService.hide();
+      this.isLoaded = true;
+      // }, 1000);
+      // }, 2000);
     });
+  }
+
+  zonaCargada(zona: string) {
+    // console.log('zona cargada', zona);
+    this.zonasCargadas++;
+    if (this.zonasCargadas >= this.numerosZonas) {
+      this.isLoaded = true;
+      this._loadingService.hide();
+    }
   }
 }

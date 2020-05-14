@@ -16,9 +16,9 @@ export class PageTestComponent implements OnInit {
 
   ngOnInit(): void {
     this.isLoaded = false;
-    this._basuraService.getAll(true).subscribe(async (data: any) => {
-      this.contenedores = data;
-      this.isLoaded = true;
-    });
+    this.isLoaded = true;
+    // this._basuraService.getAll(true).subscribe(async (data: any) => {
+    //   this.contenedores = data;
+    // });
   }
 }

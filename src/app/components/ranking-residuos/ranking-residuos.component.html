@@ -71,7 +71,7 @@
                     baseChart
                     [datasets]="residuo.nivelEstrellaMes.datasets"
                     [labels]="residuo.nivelEstrellaMes.labels"
-                    [options]="residuo.nivelEstrellaMes.chartOptions"
+                    [options]="residuo.chartOptions"
                     charType="horizontalBar"
                     [legend]="false"
                     chartType="horizontalBar"
@@ -86,7 +86,7 @@
                     baseChart
                     [datasets]="residuo.nivelEstrellaAnio.datasets"
                     [labels]="residuo.nivelEstrellaAnio.labels"
-                    [options]="residuo.nivelEstrellaAnio.chartOptions"
+                    [options]="residuo.chartOptions"
                     charType="horizontalBar"
                     [legend]="false"
                     chartType="horizontalBar"
@@ -99,7 +99,7 @@
             <div class="row">
               <div class="col-12">
                 <span class="font-bold">Problemas comunes últimos 12 meses</span>
-                <div style="display: block; width:100%">
+                <div style="display: block; width: 100%;">
                   <canvas
                     baseChart
                     [datasets]="problemasContendorChartData(residuo.nombre).datasets"

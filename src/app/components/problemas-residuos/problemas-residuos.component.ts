@@ -1,175 +1,98 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Contenedor } from 'src/app/interface/contenedor.interface';
 import { ESTADOS } from 'src/app/data/data.estados';
+import { RESIDUOS } from 'src/app/data/data.residuos';
 import { DatesService } from 'src/app/services/dates.service';
 import { Historico } from 'src/app/interface/historico.interface';
 
 import 'array-flat-polyfill';
 
 import * as moment from 'moment';
+import { HistoricoService } from 'src/app/services/historico.service';
 
 @Component({
   selector: 'app-problemas-residuos',
   templateUrl: './problemas-residuos.component.html',
-  styleUrls: ['./problemas-residuos.component.css']
+  styleUrls: ['./problemas-residuos.component.css'],
 })
 export class ProblemasResiduosComponent implements OnInit {
-  @Input() contenedores: Contenedor[];
+  // @Input() contenedores: Contenedor[];
+  @Output() onLoaded = new EventEmitter<boolean>();
 
   estados: any[] = ESTADOS;
   problemasResiduos: Residuo[] = [];
   Problema: Problema;
   ProblemaBueno: Problema;
 
-  resumenMes: {
-    labels: string[];
-    datasets: any[];
-  };
-  resumenAnio: {
-    labels: string[];
-    datasets: any[];
-  };
+  residuoActual: string = '';
+  estadoActual: string = '';
 
-  resumenMesOptions = {
-    responsive: true,
-    aspectRatio: 1,
-    scales: {
-      xAxes: [
-        {
-          ticks: {
-            beginAtZero: true,
-            max: 5
-          }
-        }
-      ]
-    }
-  };
+  RESIDUOS = RESIDUOS;
 
-  resumenAnioOptions = {
-    responsive: true,
-    aspectRatio: 1,
-    scales: {
-      xAxes: [
-        {
-          ticks: {
-            beginAtZero: true,
-            max: 5
-          }
-        }
-      ]
-    }
-  };
+  loaded: boolean = false;
+  week: { from: moment.Moment; to: moment.Moment };
+  month: { from: moment.Moment; to: moment.Moment };
+  year: { from: moment.Moment; to: moment.Moment };
+  allHistoricos: Historico[];
 
-  constructor(private dateService: DatesService) {}
+  constructor(private historicoService: HistoricoService) {
+    this.week = {
+      from: moment().startOf('week').startOf('day'),
+      to: moment().endOf('week').endOf('day'),
+    };
+    this.month = {
+      from: moment().startOf('month').startOf('day'),
+      to: moment().endOf('month').endOf('day'),
+    };
+    this.year = {
+      from: moment().subtract(12, 'month').startOf('day'),
+      to: moment().endOf('day'),
+    };
+  }
 
-  ngOnInit() {
-    const contenedoresSet = new Set(this.contenedores.map(x => x.nombre));
+  async ngOnInit() {
+    const response = await this.historicoService.getProblemasResiduos().toPromise();
+    // console.log(response);
 
-    const resumenMes: any[] = [];
-    const resumenAnio: any[] = [];
+    for (let residuo of this.RESIDUOS) {
+      const contenedorNombre = residuo.nombre;
+      const contenedorImagen = residuo.img.toLowerCase();
 
-    const historicosMes = this.contenedores
-      .filter(x => x.historico !== undefined)
-      .filter(x => x.historico.length > 0)
-      .flatMap(x => x.historico)
-      .filter(
-        (x: Historico) =>
-          x.fecha != null &&
-          moment(x.fecha).isBetween(
-            this.dateService.month.from,
-            this.dateService.month.to
-          )
-      );
-
-    const maxPuntuacionZonaMes = historicosMes.reduce(
-      (a: number, b: Historico) => a + b.calificacion,
-      0
-    );
-
-    contenedoresSet.forEach(contenedorNombre => {
-      // Obtenemos los distintos contenedores del mismo tipo
-      const listContenedores = this.contenedores.filter(
-        (contenedor: Contenedor) => contenedor.nombre === contenedorNombre
-      );
-      const contenedorImagen: string = listContenedores[0].imgContenedor;
-
-      const historicoResiduosEstados = listContenedores
-        .filter(x => x.historico !== undefined)
-        .filter(x => x.historico.length > 0)
-        .flatMap(x => x.historico);
+      this.residuoActual = contenedorNombre;
 
       let problemas: Problema[] = [];
 
-      this.estados.map(estado => {
+      for (let estado of this.estados) {
         const nombreEstado = estado.nombre;
 
-        const week = historicoResiduosEstados.filter((x: Historico) => {
-          return (
-            x.fecha != null &&
-            moment(x.fecha).isBetween(
-              this.dateService.week.from,
-              this.dateService.week.to
-            ) &&
-            x.estado.includes(nombreEstado)
-          );
-        }).length;
+        this.estadoActual = nombreEstado;
 
-        const month = historicoResiduosEstados.filter(
-          (x: Historico) =>
-            x.fecha != null &&
-            moment(x.fecha).isBetween(
-              this.dateService.month.from,
-              this.dateService.month.to
-            ) &&
-            x.estado.includes(nombreEstado)
-        ).length;
+        const week = response.semana.filter((x) => x['Resíduo'] == residuo.nombre)[0][estado.nombre] || 0;
+        const month = response.mes.filter((x) => x['Resíduo'] == residuo.nombre)[0][estado.nombre] || 0;
+        const year = response.año.filter((x) => x['Resíduo'] == residuo.nombre)[0][estado.nombre] || 0;
 
-        const year = historicoResiduosEstados.filter(
-          (x: Historico) =>
-            x.fecha != null &&
-            moment(x.fecha).isBetween(
-              this.dateService.year.from,
-              this.dateService.year.to
-            ) &&
-            x.estado.includes(nombreEstado)
-        ).length;
-
-        const puntuacionProblema = historicoResiduosEstados
-          .filter(
-            (x: Historico) =>
-              x.fecha != null &&
-              moment(x.fecha).isBetween(
-                this.dateService.month.from,
-                this.dateService.month.to
-              ) &&
-              x.estado.includes(nombreEstado)
-          )
-          .reduce((x: number, y: Historico) => x + y.calificacion || 0, 0);
-
-        const puntuacionProblemaPercent =
-          (puntuacionProblema * 100) / maxPuntuacionZonaMes || 0;
-
-        let puntuacion = (puntuacionProblemaPercent * 100) / 5;
-        puntuacion = Math.floor(Math.round(puntuacion) / 100);
+        const puntuacion = response.mes.filter((x) => x['Resíduo'] == residuo.nombre)[0]['Puntuación Mensual'][
+          estado.nombre
+        ];
 
         const problema: Problema = {
           name: nombreEstado,
-          month: month,
           iconosRellenos: Array(5)
             .fill(0)
             .map((x, idx) => {
-              return idx < puntuacion ? 1 : 0;
+              return idx < Math.round(puntuacion) ? 1 : 0;
             }),
-          puntuacion: puntuacion,
+          puntuacion: Math.round((puntuacion || 0 + Number.EPSILON) * 100) / 100,
           week: week,
-          year: year
+          month: month,
+          year: year,
         };
 
         problemas.push(problema);
-      });
+      }
 
-      this.ProblemaBueno = problemas.filter(x => x.name == 'Bueno')[0];
-      problemas = problemas.filter(x => x.name != 'Bueno');
+      this.ProblemaBueno = problemas.filter((x) => x.name == 'Bueno')[0];
+      problemas = problemas.filter((x) => x.name != 'Bueno');
 
       const problemaResiduo = {
         nombre: contenedorNombre.replace(
@@ -177,65 +100,13 @@ export class ProblemasResiduosComponent implements OnInit {
           ''
         ),
         imagen: contenedorImagen,
-        problemas: problemas
+        problemas: problemas,
       };
 
       this.problemasResiduos.push(problemaResiduo);
-
-      const historicoContendoresMes = listContenedores
-        .filter(x => x.historico !== undefined)
-        .filter(x => x.historico.length > 0)
-        .flatMap(x => x.historico)
-        .filter(
-          (x: Historico) =>
-            x.fecha != null &&
-            moment(x.fecha).isBetween(
-              this.dateService.month.to,
-              this.dateService.month.to
-            )
-        );
-      const calificacionMes = historicoContendoresMes.reduce(
-        (x, y) => x + y.calificacion,
-        0
-      );
-
-      resumenMes.push({
-        nombre: problemaResiduo.nombre,
-        value: Math.ceil((calificacionMes * 5) / 100) || 0
-      });
-
-      const historicoContendoresAnio = listContenedores
-        .filter(x => x.historico !== undefined)
-        .filter(x => x.historico.length > 0)
-        .flatMap(x => x.historico)
-        .filter(
-          (x: Historico) =>
-            x.fecha != null &&
-            moment(x.fecha).isBetween(
-              this.dateService.month.to,
-              this.dateService.month.to
-            )
-        );
-      const calificacionAnio = historicoContendoresAnio.reduce(
-        (x, y) => x + y.calificacion,
-        0
-      );
-
-      resumenAnio.push({
-        nombre: problemaResiduo.nombre,
-        value: Math.ceil((calificacionAnio * 5) / 100) || 0
-      });
-    });
-
-    this.resumenMes = {
-      labels: resumenMes.map(x => x.nombre),
-      datasets: [{ data: resumenMes.map(x => x.value) }]
-    };
-
-    this.resumenAnio = {
-      labels: resumenAnio.map(x => x.nombre),
-      datasets: [{ data: resumenAnio.map(x => x.value) }]
-    };
+    }
+    this.loaded = true;
+    this.onLoaded.emit(true);
   }
 }
 

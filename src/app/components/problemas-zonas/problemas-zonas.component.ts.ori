@@ -1,0 +1,225 @@
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Contenedor } from 'src/app/interface/contenedor.interface';
+import * as moment from 'moment';
+import { ZONAS } from 'src/app/data/data.zonas';
+import { DatesService } from 'src/app/services/dates.service';
+import { ESTADOS } from 'src/app/data/data.estados';
+import { Historico } from 'src/app/interface/historico.interface';
+
+import 'array-flat-polyfill';
+import { HistoricoService } from 'src/app/services/historico.service';
+@Component({
+  selector: 'app-problemas-zonas',
+  templateUrl: './problemas-zonas.component.html',
+  styleUrls: ['./problemas-zonas.component.css'],
+})
+export class ProblemasZonasComponent implements OnInit {
+  // @Input() contenedores: Contenedor[];
+  @Output() onLoaded = new EventEmitter<boolean>();
+
+  startMonth: moment.Moment;
+  endMonth: moment.Moment;
+
+  zonas: any[] = ZONAS;
+  estados: any[] = ESTADOS;
+  contenedoresPorZonas: ZonaProblema[] = [];
+  ProblemaBueno: Problema;
+
+  // resumenMes: any = {
+  //   labels: [],
+  //   datasets: [{ data: [] }],
+  // };
+
+  // resumenAnio: any = {
+  //   labels: [],
+  //   datasets: [{ data: [] }],
+  // };
+
+  chartOptions = {
+    responsive: true,
+    aspectRatio: 2,
+  };
+  year: { from: moment.Moment; to: moment.Moment };
+  month: { from: moment.Moment; to: moment.Moment };
+  week: { from: moment.Moment; to: moment.Moment };
+  loaded: boolean = false;
+  historicos: Historico[] = [];
+
+  constructor(private dateService: DatesService, private historicoService: HistoricoService) {
+    this.week = {
+      from: moment().startOf('week'),
+      to: moment().endOf('week'),
+    };
+
+    this.month = {
+      from: moment().subtract(4, 'week').startOf('day'),
+      to: moment().endOf('day'),
+    };
+
+    this.year = {
+      from: moment().subtract(12, 'month').startOf('day'),
+      to: moment().endOf('day'),
+    };
+  }
+
+  async ngOnInit() {
+    // const minDate = this.year.from;
+    // const maxDate = this.week.to.isSameOrAfter(this.month.to) ? this.week.to : this.month.to;
+
+    // //    console.log(minDate.format('DD/MM/YYYY'), maxDate.format('DD/MM/YYYY'));
+    // const result = (await this.historicoService.getHistorico(minDate, maxDate).toPromise()) as any;
+    // this.historicos = result.historicos;
+
+    // const historicosMes = this.historicos.filter((x: Historico) =>
+    //   moment(x.fecha).isBetween(this.month.from, this.month.to)
+    // );
+
+    // const historicosAnio = this.historicos.filter((x: Historico) =>
+    //   moment(x.fecha).isBetween(this.year.from, this.year.to)
+    // );
+
+    // const maxPuntuacionZonaMes = historicosMes.reduce((a: number, b: Historico) => a + b.calificacion, 0);
+    // const maxPuntuacionZonaAnio = historicosAnio.reduce((a: number, b: Historico) => a + b.calificacion, 0);
+
+    for (let zona of this.zonas) {
+      let nombreZona = `${zona.nombre} - ${zona.area}`;
+      const historicoZona = this.historicos.filter((x) => x.zona.startsWith(zona.nombre));
+
+      let contenedoresCount = historicoZona.length || 0;
+      let segregacion = historicoZona.reduce((a, b) => a + b.calificacion || 0, 0) / contenedoresCount;
+      let segregacionRound: number = Math.round((segregacion || 0 + Number.EPSILON) * 100) / 100; // Math.floor(segregacion * 100) / 100;
+
+      // const historicoContenedoresZonasTemp: Historico[] = [].concat(
+      //   contenedoresZona
+      //     .filter((x) => x.historico !== undefined)
+      //     .filter((contenedor) => contenedor.historico.length > 0)
+      //     .map((contenedor) => contenedor.historico)
+      // );
+
+      // const historicoContenedoresZonas: Historico[] = Array.prototype.concat.apply([], historicoContenedoresZonasTemp);
+
+      let problemas: Problema[] = [];
+
+      for (let estado of this.estados) {
+        const nombreEstado = estado.nombre;
+
+        const resultWeek = await this.historicoService
+          .getHistoricoZona(this.week.from, this.week.to, zona.nombre)
+          .toPromise();
+
+        const resultWeekProblema = await this.historicoService
+          .getHistoricoZona(this.week.from, this.week.to, zona.nombre, nombreEstado)
+          .toPromise();
+        const week = resultWeekProblema.historicos.length;
+
+        const resultMonth = await this.historicoService
+          .getHistoricoZona(this.month.from, this.month.to, zona.nombre)
+          .toPromise();
+        contenedoresCount = resultMonth.historicos.length || 0;
+        segregacion = resultMonth.historicos.reduce((a, b) => a + b.calificacion || 0, 0) / contenedoresCount;
+        segregacionRound = Math.round((segregacion || 0 + Number.EPSILON) * 100) / 100;
+
+        const resultMonthProblema = await this.historicoService
+          .getHistoricoZona(this.month.from, this.month.to, zona.nombre, nombreEstado)
+          .toPromise();
+        const month = resultMonthProblema.historicos.length;
+
+        const resultYear = await this.historicoService
+          .getHistoricoZona(this.year.from, this.year.to, zona.nombre)
+          .toPromise();
+
+        const resultYearProblema = await this.historicoService
+          .getHistoricoZona(this.year.from, this.year.to, zona.nombre, nombreEstado)
+          .toPromise();
+        const year = resultYearProblema.historicos.length;
+
+        const puntuacionProblema = resultMonthProblema.historicos.reduce(
+          (x: number, y: Historico) => x + y.calificacion || 0,
+          0
+        );
+
+        // debugger;
+        const puntuacionProblemaPercent = (puntuacionProblema * 100) / (resultMonth.historicos.length * 5);
+
+        let puntuacion = (puntuacionProblemaPercent * 5) / 100;
+        puntuacion = Math.round((puntuacion || 0 + Number.EPSILON) * 100) / 100; //(Math.round(puntuacion) / 100);
+        // let puntuacion = Math.round(((puntuacionProblemaPercent * 5) / 100 || 0 + Number.EPSILON) * 100) / 100;
+
+        const problema: Problema = {
+          name: nombreEstado,
+          iconosRellenos: Array(5)
+            .fill(false)
+            .map((x, idx) => {
+              return idx < Math.round(puntuacion);
+            }),
+          puntuacion: puntuacion || 0,
+          week: week,
+          month: month,
+          year: year,
+        };
+
+        problemas.push(problema);
+      }
+
+      this.ProblemaBueno = problemas.filter((x) => x.name == 'Bueno')[0];
+      problemas = problemas.filter((x) => x.name != 'Bueno');
+
+      // Cambiado según necesidades del cliente - 28/01/2020
+      nombreZona.startsWith('Zona 1 -') ? (nombreZona = 'Zona 1 - Manipulación de Materiales') : nombreZona;
+
+      const newZona: ZonaProblema = {
+        nombre: nombreZona,
+        contenedoresCount: contenedoresCount,
+        segregracion: segregacionRound,
+        problemas: problemas,
+      };
+
+      this.contenedoresPorZonas.push(newZona);
+
+      // this.resumenMes.labels.push(nombreZona);
+      // const puntuacionMonth = historicoZona
+      //   .filter((x: Historico) => x.fecha != null && moment(x.fecha).isBetween(this.month.from, this.month.to))
+      //   .reduce((a: number, b: Historico) => a + b.calificacion, 0);
+      // const maxMonth =
+      //   historicoZona.filter((x) => moment(x.fecha).isBetween(this.month.from, this.month.to)).length * 5;
+      // //const puntuacionMonth = Math.round(((puntuacionMonth * 5) / 100 || 0 + Number.EPSILON) * 100) / 100;
+
+      // const monthPercent = (puntuacionMonth * 100) / maxMonth || 0;
+      // const valueMonth = Math.round(((monthPercent * 5) / 100 || 0 + Number.EPSILON) * 100) / 100;
+      // this.resumenMes.datasets[0].data.push(valueMonth);
+      // //this.resumenMes.datasets[0].data.push(Math.floor(month));
+
+      // this.resumenAnio.labels.push(nombreZona);
+      // const puntuacionYear = historicoZona
+      //   .filter((x: Historico) => x.fecha != null && moment(x.fecha).isBetween(this.year.from, this.year.to))
+      //   .reduce((a: number, b: Historico) => a + b.calificacion, 0);
+      // const maxPuntuacionYear =
+      //   historicoZona.filter((x) => moment(x.fecha).isBetween(this.year.from, this.year.to)).length * 5;
+
+      // // this.resumenAnio.datasets[0].data.push(Math.floor(puntuacionYear));
+
+      // const yearPercent = (puntuacionYear * 100) / maxPuntuacionYear || 0;
+      // const valueYear = Math.round(((yearPercent * 5) / 100 || 0 + Number.EPSILON) * 100) / 100;
+      // this.resumenAnio.datasets[0].data.push(valueYear);
+    }
+    // console.log(this.resumenAnio);
+    this.loaded = true;
+    this.onLoaded.emit(true);
+  }
+}
+
+interface ZonaProblema {
+  nombre: string;
+  contenedoresCount: number;
+  problemas: Problema[];
+  segregracion: number;
+}
+
+interface Problema {
+  name: string;
+  week: number;
+  month: number;
+  year: number;
+  puntuacion: number;
+  iconosRellenos: boolean[];
+}

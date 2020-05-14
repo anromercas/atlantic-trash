@@ -1,17 +1,19 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Contenedor } from 'src/app/interface/contenedor.interface';
 import { DatesService } from 'src/app/services/dates.service';
 import * as moment from 'moment';
 import { Historico } from 'src/app/interface/historico.interface';
 import { ResiduoService } from 'src/app/services/residuo.service';
+import { typeWithParameters } from '@angular/compiler/src/render3/util';
 
 @Component({
   selector: 'app-mejor-residuo-mes',
   templateUrl: './mejor-residuo-mes.component.html',
-  styleUrls: ['./mejor-residuo-mes.component.css']
+  styleUrls: ['./mejor-residuo-mes.component.css'],
 })
 export class MejorResiduoMesComponent implements OnInit {
   @Input() contenedores: Contenedor[];
+  @Output() onLoaded = new EventEmitter<boolean>();
 
   loaded: boolean = null;
   mejorResiduo: any;
@@ -22,6 +24,7 @@ export class MejorResiduoMesComponent implements OnInit {
     this.loaded = false;
     this.mejorResiduo = await this.residuosService.mejorResiduoMes();
     this.loaded = true;
+    this.onLoaded.emit(true);
 
     // // Filtro del historico por fecha
     // // Array.prototype.concat.apply([], historicoContenedoresZonasTemp);

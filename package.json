@@ -39,6 +39,7 @@
     "ngx-bootstrap-slider": "^1.7.0",
     "rxjs": "6.5.5",
     "sweetalert": "^2.1.2",
+    "sweetalert2": "^9.10.12",
     "zone.js": "^0.10.3"
   },
   "devDependencies": {
@@ -49,7 +50,6 @@
     "@types/chart.js": "^2.7.53",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~13.13.2",
-    "angular-cli": "^1.0.0-beta.28.3",
     "codelyzer": "~5.2.2",
     "gulp": "^4.0.2",
     "gulp-javascript-obfuscator": "^1.1.6",

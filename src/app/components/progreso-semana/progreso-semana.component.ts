@@ -1,14 +1,15 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Contenedor } from 'src/app/interface/contenedor.interface';
 import { ContenedorService } from 'src/app/services/contenedor.service';
 
 @Component({
   selector: 'app-progreso-semana',
   templateUrl: './progreso-semana.component.html',
-  styleUrls: ['./progreso-semana.component.css']
+  styleUrls: ['./progreso-semana.component.css'],
 })
 export class ProgresoSemanaComponent implements OnInit {
   @Input() contenedores: Contenedor[];
+  @Output() onLoaded = new EventEmitter<boolean>();
   contenedoresCount: number = 0;
   contenedoresValoradosCount: number = 0;
 
@@ -20,6 +21,7 @@ export class ProgresoSemanaComponent implements OnInit {
 
     this.contenedorService.getProgresoSemana().subscribe((x: any) => {
       this.contenedoresValoradosCount = x.total;
+      this.onLoaded.emit(true);
     });
   }
 }

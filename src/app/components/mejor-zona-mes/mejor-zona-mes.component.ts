@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 
 import { Contenedor } from 'src/app/interface/contenedor.interface';
 import { DatesService } from 'src/app/services/dates.service';
@@ -9,10 +9,11 @@ import { ZonaService } from 'src/app/services/zona.service';
 @Component({
   selector: 'app-mejor-zona-mes',
   templateUrl: './mejor-zona-mes.component.html',
-  styleUrls: ['./mejor-zona-mes.component.css']
+  styleUrls: ['./mejor-zona-mes.component.css'],
 })
 export class MejorZonaMesComponent implements OnInit {
   @Input() contenedores: Contenedor[];
+  @Output() onLoaded = new EventEmitter<boolean>();
 
   nombreMejorZona: string;
   startMonth: moment.Moment;
@@ -20,10 +21,7 @@ export class MejorZonaMesComponent implements OnInit {
   loaded: boolean = null;
   zona: any = null;
 
-  constructor(
-    private dateService: DatesService,
-    private readonly zonaService: ZonaService
-  ) {
+  constructor(private dateService: DatesService, private readonly zonaService: ZonaService) {
     this.startMonth = moment().startOf('month');
     this.endMonth = moment().endOf('month');
   }
@@ -35,6 +33,7 @@ export class MejorZonaMesComponent implements OnInit {
     this.nombreMejorZona = zona.mejorZona;
 
     this.loaded = true;
+    this.onLoaded.emit(true);
     // const zonasSet = new Set(
     //   this.contenedores.filter(x => x.zona !== '').map(x => x.zona)
     // );

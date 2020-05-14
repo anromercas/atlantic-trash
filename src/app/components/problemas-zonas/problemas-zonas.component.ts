@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Contenedor } from 'src/app/interface/contenedor.interface';
 import * as moment from 'moment';
 import { ZONAS } from 'src/app/data/data.zonas';
@@ -7,13 +7,15 @@ import { ESTADOS } from 'src/app/data/data.estados';
 import { Historico } from 'src/app/interface/historico.interface';
 
 import 'array-flat-polyfill';
+import { HistoricoService } from 'src/app/services/historico.service';
 @Component({
   selector: 'app-problemas-zonas',
   templateUrl: './problemas-zonas.component.html',
-  styleUrls: ['./problemas-zonas.component.css']
+  styleUrls: ['./problemas-zonas.component.css'],
 })
 export class ProblemasZonasComponent implements OnInit {
-  @Input() contenedores: Contenedor[];
+  // @Input() contenedores: Contenedor[];
+  @Output() onLoaded = new EventEmitter<boolean>();
 
   startMonth: moment.Moment;
   endMonth: moment.Moment;
@@ -23,153 +25,98 @@ export class ProblemasZonasComponent implements OnInit {
   contenedoresPorZonas: ZonaProblema[] = [];
   ProblemaBueno: Problema;
 
-  resumenMes: any = {
-    labels: [],
-    datasets: [{ data: [] }]
-  };
+  // resumenMes: any = {
+  //   labels: [],
+  //   datasets: [{ data: [] }],
+  // };
 
-  resumenAnio: any = {
-    labels: [],
-    datasets: [{ data: [] }]
-  };
+  // resumenAnio: any = {
+  //   labels: [],
+  //   datasets: [{ data: [] }],
+  // };
 
   chartOptions = {
     responsive: true,
-    aspectRatio: 2
+    aspectRatio: 2,
   };
+  year: { from: moment.Moment; to: moment.Moment };
+  month: { from: moment.Moment; to: moment.Moment };
+  week: { from: moment.Moment; to: moment.Moment };
+  loaded: boolean = false;
+  historicos: Historico[] = [];
 
-  constructor(private dateService: DatesService) {}
+  constructor(private dateService: DatesService, private historicoService: HistoricoService) {
+    this.week = {
+      from: moment().startOf('week'),
+      to: moment().endOf('week'),
+    };
 
-  ngOnInit() {
-    const historicosMes = this.contenedores
-      .filter(x => x.historico !== undefined)
-      .filter(x => x.historico.length > 0)
-      .flatMap(x => x.historico)
-      .filter(
-        (x: Historico) =>
-          x.fecha != null && moment(x.fecha).isBetween(this.dateService.month.from, this.dateService.month.to)
-      );
+    this.month = {
+      from: moment().subtract(4, 'week').startOf('day'),
+      to: moment().endOf('day'),
+    };
 
-    const historicosAnio = this.contenedores
-      .filter(x => x.historico !== undefined)
-      .filter(x => x.historico.length > 0)
-      .flatMap(x => x.historico)
-      .filter(
-        (x: Historico) =>
-          x.fecha != null && moment(x.fecha).isBetween(this.dateService.year.from, this.dateService.year.to)
-      );
+    this.year = {
+      from: moment().subtract(12, 'month').startOf('day'),
+      to: moment().endOf('day'),
+    };
+  }
 
-    const maxPuntuacionZonaMes = historicosMes.reduce((a: number, b: Historico) => a + b.calificacion, 0);
+  async ngOnInit() {
+    const response = await this.historicoService.getProblemasZonas().toPromise();
+    // console.log(response);
 
-    const maxPuntuacionZonaAnio = historicosAnio.reduce((a: number, b: Historico) => a + b.calificacion, 0);
-
-    this.zonas.map(zona => {
+    for (let zona of this.zonas) {
       let nombreZona = `${zona.nombre} - ${zona.area}`;
-      const contenedoresZona = this.contenedores.filter(x => x.zona === nombreZona);
-
-      const contenedoresCount = contenedoresZona.length || 0;
-      const segregacion = contenedoresZona.reduce((a, b) => a + b.calificacion || 0, 0) / contenedoresCount;
-      const segregacionRound: number = Math.floor(segregacion * 100) / 100;
-
-      const historicoContenedoresZonasTemp: Historico[] = [].concat(
-        contenedoresZona
-          .filter(x => x.historico !== undefined)
-          .filter(contenedor => contenedor.historico.length > 0)
-          .map(contenedor => contenedor.historico)
-      );
-
-      const historicoContenedoresZonas: Historico[] = Array.prototype.concat.apply([], historicoContenedoresZonasTemp);
 
       let problemas: Problema[] = [];
 
-      this.estados.map(estado => {
+      for (let estado of this.estados) {
         const nombreEstado = estado.nombre;
 
-        const week = historicoContenedoresZonas.filter((x: Historico) => {
-          return (
-            x.fecha != null &&
-            moment(x.fecha).isBetween(this.dateService.week.from, this.dateService.week.to) &&
-            x.estado.includes(nombreEstado)
-          );
-        }).length;
+        const puntuacion = response.mes.filter((x) => x.zona == zona.nombre)[0]['Puntuación Mensual'][nombreEstado];
 
-        const month = historicoContenedoresZonas.filter(
-          (x: Historico) =>
-            x.fecha != null &&
-            moment(x.fecha).isBetween(this.dateService.month.from, this.dateService.month.to) &&
-            x.estado.includes(nombreEstado)
-        ).length;
-
-        const year = historicoContenedoresZonas.filter(
-          (x: Historico) =>
-            x.fecha != null &&
-            moment(x.fecha).isBetween(this.dateService.year.from, this.dateService.year.to) &&
-            x.estado.includes(nombreEstado)
-        ).length;
-
-        const puntuacionProblema = historicoContenedoresZonas
-          .filter(
-            (x: Historico) =>
-              x.fecha != null &&
-              moment(x.fecha).isBetween(this.dateService.month.from, this.dateService.month.to) &&
-              x.estado.includes(nombreEstado)
-          )
-          .reduce((x: number, y: Historico) => x + y.calificacion || 0, 0);
-
-        const puntuacionProblemaPercent = (puntuacionProblema * 100) / maxPuntuacionZonaMes;
-
-        let puntuacion = (puntuacionProblemaPercent * 100) / 5;
-        puntuacion = Math.floor(Math.round(puntuacion) / 100);
+        const week = response.semana.filter((x) => x.zona == zona.nombre)[0][nombreEstado];
+        const month = response.mes.filter((x) => x.zona == zona.nombre)[0][nombreEstado];
+        const year = response.año.filter((x) => x.zona == zona.nombre)[0][nombreEstado];
 
         const problema: Problema = {
           name: nombreEstado,
-          month: month,
           iconosRellenos: Array(5)
             .fill(false)
             .map((x, idx) => {
-              return idx < puntuacion;
+              return idx < Math.round(puntuacion);
             }),
-          puntuacion: puntuacion || 0,
+          puntuacion: Math.round(puntuacion) || 0,
           week: week,
-          year: year
+          month: month,
+          year: year,
         };
 
         problemas.push(problema);
-      });
+      }
 
-      this.ProblemaBueno = problemas.filter(x => x.name == 'Bueno')[0];
-      problemas = problemas.filter(x => x.name != 'Bueno');
+      this.ProblemaBueno = problemas.filter((x) => x.name == 'Bueno')[0];
+      problemas = problemas.filter((x) => x.name != 'Bueno');
 
       // Cambiado según necesidades del cliente - 28/01/2020
       nombreZona.startsWith('Zona 1 -') ? (nombreZona = 'Zona 1 - Manipulación de Materiales') : nombreZona;
 
+      const contenedoresCount = response.mes.filter((x) => x.zona == zona.nombre)[0]['Total Contenedores Mes'];
+      const segregacion = response.mes.filter((x) => x.zona == zona.nombre)[0]['Calidad Segregación'];
+
       const newZona: ZonaProblema = {
         nombre: nombreZona,
-        contenedoresCount: contenedoresCount,
-        segregracion: segregacionRound,
-        problemas: problemas
+        contenedoresCount: Math.round((contenedoresCount || 0 + Number.EPSILON) * 100) / 100,
+        segregracion: Math.round((segregacion || 0 + Number.EPSILON) * 100) / 100,
+        problemas: problemas,
       };
 
       this.contenedoresPorZonas.push(newZona);
+    }
 
-      this.resumenMes.labels.push(nombreZona);
-      const month = historicoContenedoresZonas
-        .filter(
-          (x: Historico) =>
-            x.fecha != null && moment(x.fecha).isBetween(this.dateService.month.from, this.dateService.month.to)
-        )
-        .reduce((a: number, b: Historico) => a + b.calificacion, 0);
-      this.resumenMes.datasets[0].data.push(Math.ceil(month));
-
-      this.resumenAnio.labels.push(nombreZona);
-      const year = historicoContenedoresZonas
-        .filter(
-          (x: Historico) =>
-            x.fecha != null && moment(x.fecha).isBetween(this.dateService.year.from, this.dateService.year.to)
-        )
-        .reduce((a: number, b: Historico) => a + b.calificacion, 0);
-      this.resumenAnio.datasets[0].data.push(Math.ceil(year));
-    });
+    this.loaded = true;
+    this.onLoaded.emit(true);
   }
 }
 

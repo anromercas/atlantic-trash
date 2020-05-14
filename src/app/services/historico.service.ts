@@ -3,10 +3,9 @@ import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { HistoricoResponse } from '../interface/historico-response.inteface';
 import { Moment } from 'moment';
-import { ResiduosZonaComponent } from '../components/residuos-zona/residuos-zona.component';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class HistoricoService {
   constructor(public httpClient: HttpClient) {}
@@ -16,19 +15,58 @@ export class HistoricoService {
     params = params.append('fechadesde', from.toISOString());
     params = params.append('fechahasta', to.toISOString());
 
-    return this.httpClient.get<HistoricoResponse>(
-      `${environment.baseUrl}historico-entre-fechas`,
-      { observe: 'body', params }
-    );
+    return this.httpClient.get<HistoricoResponse>(`${environment.baseUrl}historico-entre-fechas`, {
+      observe: 'body',
+      params,
+    });
   }
 
-  async getHistoricoResiduo(from: Moment, to: Moment, residuo: string = '') {
-    let url = `${environment.baseUrl}historico-residuo?fechadesde=${from.format(
-      'YYYY-MM-DD'
-    )}&fechahasta=${to.format('YYYY-MM-DD')}&desde=0&hasta=999`;
-    if (residuo !== '') {
-      url = `${url}&residuo=${residuo}`;
+  getHistoricoZona(from: Moment, to: Moment, zona: string = '', estado: string = '') {
+    const url = `${environment.baseUrl}historicosPorZona`;
+    let params: HttpParams = new HttpParams().set('fechadesde', from.toISOString()).set('fechahasta', to.toISOString());
+
+    if (zona != '') {
+      params = params.append('zona', zona);
     }
-    return await this.httpClient.get<HistoricoResponse>(url).toPromise();
+    if (estado != '') {
+      params = params.append('estado', estado);
+    }
+
+    return this.httpClient.get<HistoricoResponse>(url, { params });
+  }
+
+  getHistoricoResiduo(from: Moment, to: Moment, residuo: string = '', estado: string = '') {
+    const url = `${environment.baseUrl}historico-residuo`;
+
+    let params: HttpParams = new HttpParams()
+      .set('limite', '0')
+      .set('fechadesde', from.toISOString())
+      .set('fechahasta', to.toISOString());
+
+    if (residuo != '') {
+      params = params.append('residuo', residuo);
+    }
+
+    if (estado != '') {
+      params = params.append('estado', estado);
+    }
+
+    // let url = `${environment.baseUrl}historico-residuo?fechadesde=${from.format(
+    //   'YYYY-MM-DD'
+    // )}&fechahasta=${to.format('YYYY-MM-DD')}&desde=0&hasta=0`;
+    // if (residuo !== '') {
+    //   url = `${url}&residuo=${residuo}`;
+    // }
+    return this.httpClient.get<HistoricoResponse>(url, { params });
+  }
+
+  getProblemasZonas() {
+    const url = `${environment.baseUrl}problemas-por-zonas`;
+    return this.httpClient.get<any>(url);
+  }
+
+  getProblemasResiduos() {
+    const url = `${environment.baseUrl}problemas-por-residuos`;
+    return this.httpClient.get<any>(url);
   }
 }
