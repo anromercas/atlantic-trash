@@ -212,10 +212,7 @@ export class RankingResiduosComponent implements OnInit {
           .reduce((a, b) => a + b.calificacion, 0);
         let puntuacionSemanaPorcentaje = (calificacionSemana * 100) / maxPuntuacionSemana || 0;
         puntuacionSemanaPorcentaje = Math.round((puntuacionSemanaPorcentaje || 0 + Number.EPSILON) * 100) / 100;
-        const calificacionSemanaPercent = (puntuacionSemanaPorcentaje * 100) / 5;
-
-        // const calificacionSemanaPercent = Math.round(calificacion * 100);
-        // const nivelEstrellaSemana = (calificacionSemanaPercent * 5) / 100;
+        const calificacionSemanaPercent = (puntuacionSemanaPorcentaje * 5) / 100;
 
         // Calculamos la puntuacion del mes
         const maxPuntuacionMes =
@@ -232,9 +229,7 @@ export class RankingResiduosComponent implements OnInit {
         const nivelEstrellaMes: ChartData = {
           labels: [''],
           datasets: [{ data: [calificacionMes] }],
-          // chartOptions: this.chartOptionsNiveles,
         };
-        // const nivelEstrellaMes = (puntuacionMes * 5) / 100;
 
         // Calculamos la puntuacion del año
         const maxPuntuacionAnio =
@@ -251,34 +246,19 @@ export class RankingResiduosComponent implements OnInit {
         const nivelEstrellaAnio: ChartData = {
           labels: [''],
           datasets: [{ data: [calificacionAnio] }],
-          // chartOptions: this.chartOptionsNiveles,
         };
-        // const nivelEstrellaAnio = (puntuacionAnio * 5) / 100;
 
         this.rankingResiduos.push({
           nombre: residuo.nombre,
           imgContenedor: historicoResiduo[0].imgContenedor,
           media: calificacionSemanaPercent,
           nivelEstrellaSemana: Math.ceil(calificacionSemanaPercent),
-          nivelEstrellaMes: nivelEstrellaMes, //  Math.ceil(nivelEstrellaMes),
-          nivelEstrellaAnio: nivelEstrellaAnio, // Math.ceil(nivelEstrellaAnio)
+          nivelEstrellaMes: nivelEstrellaMes,
+          nivelEstrellaAnio: nivelEstrellaAnio,
           chartOptions: this.chartOptionsNiveles,
         });
       }
     }
-
-    // this.resumenMes = {
-    //   labels: resumenMes.map((x) => x.nombre),
-    //   datasets: [{ data: resumenMes.map((x) => x.value) }],
-    // };
-
-    // this.resumenAnio = {
-    //   labels: resumenAnio.map((x) => x.nombre),
-    //   datasets: [{ data: resumenAnio.map((x) => x.value) }],
-    // };
-
-    // console.log(this.resumenMes);
-    // console.log(this.resumenAnio);
 
     this.isLoading = false;
   }

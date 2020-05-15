@@ -52,7 +52,7 @@ export class ProblemasResiduosComponent implements OnInit {
 
   async ngOnInit() {
     const response = await this.historicoService.getProblemasResiduos().toPromise();
-    // console.log(response);
+    console.log(response);
 
     for (let residuo of this.RESIDUOS) {
       const contenedorNombre = residuo.nombre;
