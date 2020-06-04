@@ -35,12 +35,12 @@ export const RESIDUOS = [
     seleccionado: false,
     color: '',
   },
-  {
+/*   {
     nombre: 'EPIs',
     img: 'epis.png',
     seleccionado: false,
     color: '',
-  },
+  }, */
   {
     nombre: 'EPIs Contaminados',
     img: 'epis-contaminados.png',
@@ -50,12 +50,6 @@ export const RESIDUOS = [
   {
     nombre: 'Papel y Cartón',
     img: 'papel-y-carton.png',
-    seleccionado: false,
-    color: '',
-  },
-  {
-    nombre: 'Plástico/envases Contaminados',
-    img: 'plastico-envases-contaminados.png',
     seleccionado: false,
     color: '',
   },
