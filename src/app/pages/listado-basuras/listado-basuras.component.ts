@@ -51,8 +51,10 @@ export class ListadoBasurasComponent implements OnInit {
         }
 
         this.calculateData();
+        console.log(this.contenedores);
       });
     }
+
   }
 
   calculateData() {

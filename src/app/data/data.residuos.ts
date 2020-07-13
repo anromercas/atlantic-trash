@@ -48,6 +48,12 @@ export const RESIDUOS = [
     color: '',
   },
   {
+    nombre: 'Envases Plásticos/Metálicos Contaminados',
+    img: 'plastico-envases-contaminados.png',
+    seleccionado: false,
+    color: '',
+  },
+  {
     nombre: 'Papel y Cartón',
     img: 'papel-y-carton.png',
     seleccionado: false,
@@ -90,7 +96,7 @@ export const RESIDUOS = [
     color: '',
   },
   {
-    nombre: 'de Calorifugado',
+    nombre: 'Calorifugado',
     img: 'calorifugado.png',
     seleccionado: false,
     color: '',
@@ -102,7 +108,7 @@ export const RESIDUOS = [
     color: '',
   },
   {
-    nombre: 'de Refractario NP',
+    nombre: 'Refractario NP',
     img: 'refractario.png',
     seleccionado: false,
     color: '',

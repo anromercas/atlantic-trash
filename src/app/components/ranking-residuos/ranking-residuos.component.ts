@@ -89,6 +89,7 @@ export class RankingResiduosComponent implements OnInit {
 
     this.loaded = true;
     this.onLoaded.emit(true);
+    console.log(this.rankingResiduos);
   }
 
   tieneProblemasContendor(nombre: string): boolean {
@@ -151,6 +152,10 @@ export class RankingResiduosComponent implements OnInit {
 
       const historicoResiduoMes = contenedoresPuntuadosMes.filter((x) => x.nombre.includes(residuo.nombre));
       const historicoResiduoAnio = contenedoresPuntuadosAnio.filter((x) => x.nombre.includes(residuo.nombre));
+
+      if( residuo.nombre === 'Envases Plásticos/Metálicos Contaminados') {
+        console.log(historicoResiduoMes);
+      }
 
       this.historico = this.historico.concat(historicoResiduoAnio);
 

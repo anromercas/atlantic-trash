@@ -30,7 +30,7 @@ export class DashboardComponent implements OnInit {
   isLoaded: boolean = false;
 
   zonasCargadas: number = 0;
-  numerosZonas: number = 4;
+  numerosZonas: number = 2;
 
   constructor(
     public router: Router,
